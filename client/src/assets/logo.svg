@@ -1,0 +1,20 @@
+<svg width="400" height="250" viewBox="0 0 400 250" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Clapperboard Top -->
+  <rect x="80" y="40" width="220" height="40" rx="6" fill="#222"/>
+  <!-- Stripes on Clapperboard -->
+  <rect x="85" y="45" width="35" height="24" transform="rotate(-15 85 45)" fill="#fff" />
+  <rect x="130" y="44" width="35" height="24" transform="rotate(-15 130 44)" fill="#222"/>
+  <rect x="175" y="48" width="35" height="24" transform="rotate(-14 175 48)" fill="#fff" />
+  <rect x="220" y="50" width="35" height="24" transform="rotate(-13 220 50)" fill="#222"/>
+  <rect x="265" y="53" width="35" height="24" transform="rotate(-13 265 53)" fill="#fff" />
+  <!-- Clapperboard Hinge -->
+  <circle cx="100" cy="80" r="7" fill="#fff" stroke="#222" stroke-width="4"/>
+  <!-- Main Body of Clapperboard -->
+  <rect x="90" y="75" width="200" height="90" rx="8" fill="#222"/>
+  <!-- Clapperboard Lines -->
+  <rect x="120" y="100" width="140" height="9" fill="#fff"/>
+  <rect x="120" y="122" width="80" height="9" fill="#fff"/>
+  <rect x="120" y="144" width="140" height="9" fill="#fff"/>
+  <!-- App Name -->
+  <text x="50" y="210" font-family="Arial Black, Arial, sans-serif" font-size="56" fill="#222" font-weight="bold">BMS-CLONE</text>
+</svg>
