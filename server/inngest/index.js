@@ -5,6 +5,18 @@ import { Inngest } from "inngest";
 import mongoose from "mongoose";
 import User from "../models/User.js";
 
+const ensureDBConnection = async () => {
+    if (mongoose.connection.readyState === 0) {
+        try {
+            await mongoose.connect(`${process.env.MONGODB_URI}/QuickShow`); // Use correct casing
+            console.log('MongoDB connected in Inngest context');
+        } catch (error) {
+            console.error('MongoDB connection error in Inngest:', error);
+            throw error;
+        }
+    }
+};
+
 // Create a client to send and receive events
 export const inngest = new Inngest({ id: "movie-ticket-booking" });
 
@@ -18,6 +30,7 @@ export const syncUserCreation = inngest.createFunction(
     },
     async ({ event }) => {
         try {
+             await ensureDBConnection();
             const { id, first_name, last_name, email_addresses, image_url } = event.data;
             const userData = {
                 _id: id,
@@ -43,6 +56,7 @@ export const syncUserDeletion = inngest.createFunction(
     },
     async ({ event }) => {
         try {
+             await ensureDBConnection();
             const { id } = event.data;
             await User.findByIdAndDelete(id);
             console.log(`User ${id} deleted successfully`);
@@ -62,6 +76,7 @@ export const syncUserUpdation = inngest.createFunction(
     },
     async ({ event }) => {
         try {
+             await ensureDBConnection();
             const { id, first_name, last_name, email_addresses, image_url } = event.data;
             const userData = {
                 email: email_addresses[0].email_address,
