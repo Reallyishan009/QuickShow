@@ -2,6 +2,7 @@
 // import { User as ClerkUser } from "@clerk/express";
 
 import { Inngest } from "inngest";
+import mongoose from "mongoose";
 import User from "../models/User.js";
 
 // Create a client to send and receive events
