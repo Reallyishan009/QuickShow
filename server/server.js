@@ -9,6 +9,7 @@ import showRouter from './routes/showRoutes.js';
 import bookingRouter from './routes/bookingRoutes.js';
 import userRouter from './routes/userRoutes.js';
 import adminRouter from './routes/adminRoutes.js'; // ✅ Uncomment this
+import { stripeWebhooks } from './controllers/stripeWebHooks.js';
 
 const app = express();
 const port = 3000;
@@ -20,6 +21,8 @@ try {
     console.error('Failed to connect to database:', error);
     process.exit(1);
 }
+
+app.use('/api/stripe',express.raw({ type: 'application/json' }),stripeWebhooks);
 
 // Middleware
 app.use(express.json());

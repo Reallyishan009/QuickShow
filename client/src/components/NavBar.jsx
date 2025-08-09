@@ -3,12 +3,15 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { assets } from '../assets/assets';
 import { useClerk, UserButton, useUser } from '@clerk/clerk-react';
+import { useAppContext } from '../context/AppContext';
 
 const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user } = useUser();
   const { openSignIn } = useClerk();
   const navigate = useNavigate();
+
+  const { favouriteMovies } = useAppContext();
 
   return (
     <div className='fixed top-0 left-0 z-50 w-full flex items-center justify-between px-6 md:px-15 lg:px-36 py-5 bg-transparent'>
@@ -33,8 +36,12 @@ const NavBar = () => {
         <Link to='/movies' onClick={() => { window.scrollTo(0, 0); setIsOpen(false); }}>Movies</Link>
         <Link to='/' onClick={() => { window.scrollTo(0, 0); setIsOpen(false); }}>Theaters</Link>
         <Link to='/' onClick={() => { window.scrollTo(0, 0); setIsOpen(false); }}>Releases</Link>
-        <Link to='/favorite' onClick={() => { window.scrollTo(0, 0); setIsOpen(false); }}>Favorites</Link>
-
+        {/* ✅ FIXED: Add safety check for favouriteMovies */}
+        {favouriteMovies && favouriteMovies.length > 0 && (
+          <Link to='/favorite' onClick={() => { window.scrollTo(0, 0); setIsOpen(false); }}>
+            Favorites ({favouriteMovies.length})
+          </Link>
+        )}
         {user && <Link to='/my-bookings' onClick={() => { window.scrollTo(0, 0); setIsOpen(false); }}>My Bookings</Link>}
       </div>
 
@@ -50,7 +57,6 @@ const NavBar = () => {
             </button>
           ) : (
             <UserButton afterSignOutUrl="/" />
-            // For custom menu actions, refer to Clerk documentation
           )
         }
       </div>

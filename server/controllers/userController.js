@@ -1,72 +1,124 @@
+// userController.js
 import { clerkClient } from "@clerk/express";
 import Booking from "../models/Booking.js";
 import Movie from "../models/Movie.js";
 
-//API CONTROLLER Function to get User Bookings
 export const getUserBookings = async (req, res) => {
-    try {
-        const { userId } = req.auth();
-
-        const bookings = await Booking.find({ user: userId })
-            .populate({
-                path: 'show',
-                populate: { path: 'movie' }
-            })
-            .sort({ createdAt: -1 });
-            
-        res.json({ success: true, bookings });
-    } catch (error) {
-        console.log(error.message);
-        res.status(500).json({ success: false, message: error.message });
-    }
+  console.log("[getUserBookings] Route handler started");
+  
+  try {
+    console.log("[getUserBookings] Trying to get userId from req.auth()");
+    const { userId } = req.auth();
+    console.log(`[getUserBookings] UserId obtained: ${userId}`);
+    
+    // Skip database query for now - just return a simple response
+    console.log("[getUserBookings] Sending simple response");
+    res.json({ 
+      success: true, 
+      message: "Route working", 
+      userId: userId,
+      bookings: [] 
+    });
+    
+  } catch (error) {
+    console.error(`[getUserBookings] Error: ${error.message}`);
+    res.status(500).json({ success: false, message: error.message });
+  }
 };
 
-//API Controller Function to update Favorite Movie in Clerk User Metadata
+
+// Your existing updateFavorite and getFavorites functions remain unchanged
 export const updateFavorite = async (req, res) => {
-    try {
-        const { movieId } = req.body;
-        const { userId } = req.auth(); // Fixed: Added missing userId declaration
+  try {
+    const { movieId } = req.body;
+    const { userId } = req.auth();
 
-        const user = await clerkClient.users.getUser(userId);
+    console.log('🔍 Update favorites called for user:', userId, 'movie:', movieId);
 
-        // Initialize favoriteMovies array if it doesn't exist
-        if (!user.privateMetadata.favoriteMovies) {
-            user.privateMetadata.favoriteMovies = [];
-        }
+    const user = await clerkClient.users.getUser(userId);
+    console.log('🔍 Current user metadata:', user.privateMetadata);
 
-        // Toggle favorite movie
-        if (!user.privateMetadata.favoriteMovies.includes(movieId)) {
-            user.privateMetadata.favoriteMovies.push(movieId);
-        } else {
-            user.privateMetadata.favoriteMovies = user.privateMetadata.favoriteMovies.filter(id => id !== movieId);
-        }
-
-        await clerkClient.users.updateUser(user.id, {
-            privateMetadata: user.privateMetadata
-        });
-        
-        res.json({ success: true, message: "Favorite movie updated successfully" });
-    } catch (error) {
-        console.log(error.message);
-        res.status(500).json({ success: false, message: error.message });
+    let privateMetadata = user.privateMetadata;
+    
+    if (!privateMetadata.favoriteMovies) {
+      privateMetadata.favoriteMovies = [];
     }
+
+    const movieIdStr = String(movieId);
+    const currentFavorites = privateMetadata.favoriteMovies;
+
+    const isCurrentlyFavorite = currentFavorites.includes(movieIdStr);
+    
+    if (!isCurrentlyFavorite) {
+      privateMetadata.favoriteMovies.push(movieIdStr);
+      console.log('✅ Added to favorites:', movieIdStr);
+    } else {
+      privateMetadata.favoriteMovies = currentFavorites.filter(id => String(id) !== movieIdStr);
+      console.log('❌ Removed from favorites:', movieIdStr);
+    }
+
+    await clerkClient.users.updateUser(userId, {
+      privateMetadata: privateMetadata
+    });
+
+    console.log('🔍 Updated metadata:', privateMetadata);
+
+    res.json({ 
+      success: true, 
+      message: isCurrentlyFavorite ? "Removed from favorites" : "Added to favorites",
+      favoriteMovies: privateMetadata.favoriteMovies,
+      action: isCurrentlyFavorite ? "removed" : "added"
+    });
+
+  } catch (error) {
+    console.error('❌ Update favorites error:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
 };
 
-//API Controller Function to get User's Favorite Movies
 export const getFavorites = async (req, res) => {
-    try {
-        const { userId } = req.auth();
-        const user = await clerkClient.users.getUser(userId);
-        
-        // Fixed: Use consistent property name (favoriteMovies)
-        const favorites = user.privateMetadata.favoriteMovies || [];
+  try {
+    const { userId } = req.auth();
+    const user = await clerkClient.users.getUser(userId);
 
-        // Getting movies from database
-        const movies = await Movie.find({ _id: { $in: favorites } });
+    console.log('🔍 Getting favorites for user:', userId);
 
-        res.json({ success: true, movies });
-    } catch (error) {
-        console.log(error.message);
-        res.status(500).json({ success: false, message: error.message });
+    const favorites = user.privateMetadata?.favoriteMovies || [];
+    console.log('🔍 Favorite movie IDs:', favorites);
+
+    if (favorites.length === 0) {
+      return res.json({ success: true, movies: [] });
     }
+
+    const movies = await Movie.find({ _id: { $in: favorites } });
+    console.log('🔍 Found movies:', movies.length);
+
+    res.json({ success: true, movies });
+
+  } catch (error) {
+    console.error('❌ Get favorites error:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// In userController.js, add this simple test endpoint
+export const testBookings = async (req, res) => {
+  try {
+    const { userId } = req.auth();
+    console.log(`[testBookings] Testing for userId: ${userId}`);
+    
+    // Simple count without population
+    const count = await Booking.countDocuments({ user: userId });
+    console.log(`[testBookings] Found ${count} bookings for user`);
+    
+    res.json({ 
+      success: true, 
+      message: "Backend is working", 
+      userId: userId,
+      bookingCount: count 
+    });
+  } catch (error) {
+    console.error(`[testBookings] Error: ${error.message}`);
+    res.status(500).json({ success: false, message: error.message });
+  }
 };

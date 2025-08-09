@@ -1,24 +1,74 @@
+// pages/MyBookings.jsx
 import React, { useEffect, useState } from 'react';
-import { dummyBookingData } from '../assets/assets';
 import BlurCircle from '../components/BlurCircle';
 import Loading from '../components/Loading';
 import timeFormat from '../lib/timeFormat';
 import { dateFormat } from '../lib/dateFormat';
+import { useAppContext } from '../context/AppContext';
 
 const MyBookings = () => {
   const currency = import.meta.env.VITE_CURRENCY;
+  const { axios, getToken, user, image_base_url } = useAppContext();
 
   const [bookings, setBookings] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const getMyBookings = async () => {
-    setBookings(dummyBookingData);
-    setIsLoading(false);
-  };
+  console.log("[getMyBookings] Starting booking fetch process");
+  setIsLoading(true);
+  
+  try {
+    const token = await getToken();
+    console.log("[getMyBookings] Auth token obtained:", !!token);
+    console.log("[getMyBookings] Token length:", token ? token.length : 0);
 
+    console.log("[getMyBookings] Making API request to /api/user/bookings");
+    const startTime = Date.now();
+    
+    const { data } = await axios.get("/api/user/bookings", {
+      headers: { Authorization: `Bearer ${token}` },
+      timeout: 30000,
+    });
+    
+    const endTime = Date.now();
+    console.log(`[getMyBookings] API request completed in ${endTime - startTime}ms`);
+    console.log("[getMyBookings] Full API response:", data);
+
+    if (data && data.success) {
+      console.log(`[getMyBookings] Success: ${data.bookings ? data.bookings.length : 'no bookings array'} bookings`);
+      if (data.bookings && data.bookings.length > 0) {
+        console.log("[getMyBookings] First booking sample:", data.bookings[0]);
+      }
+      setBookings(data.bookings || []);
+    } else {
+      console.warn("[getMyBookings] API returned success:false or no success field");
+      setBookings([]);
+    }
+  } catch (error) {
+    console.error("[getMyBookings] Error details:", {
+      message: error.message,
+      code: error.code,
+      response: error.response?.data,
+      status: error.response?.status
+    });
+    setBookings([]);
+  } finally {
+    console.log("[getMyBookings] Setting loading to false");
+    setIsLoading(false);
+  }
+};
+
+  // Fetch bookings when user logs in or changes
   useEffect(() => {
-    getMyBookings();
-  }, []);
+    if (user) {
+      console.log("[MyBookings] User detected, fetching bookings");
+      getMyBookings();
+    } else {
+      console.log("[MyBookings] No user signed in");
+      setBookings([]);
+      setIsLoading(false);
+    }
+  }, [user]);
 
   if (isLoading) return <Loading />;
 
@@ -32,23 +82,22 @@ const MyBookings = () => {
         <p className="text-center mt-6 text-gray-400">You have no bookings yet.</p>
       )}
 
-      {bookings.map((item, index) => (
+      {bookings.map((item) => (
         <div 
-          key={index} 
+          key={item._id || item.id} 
           className='flex flex-col md:flex-row justify-between bg-primary/8 border border-primary/20 rounded-lg mt-4 p-2 max-w-3xl'
         >
           <div className='flex flex-col md:flex-row'>
             <img
-              src={item.show.movie.poster_path}
+              src={image_base_url + item.show.movie.poster_path}
               alt={item.show.movie.title}
               className="md:max-w-[180px] aspect-video h-auto object-cover object-bottom rounded"
+              onError={(e) => { e.target.src = '/placeholder-poster.jpg'; }}
             />
             <div className="flex flex-col p-4">
               <p className="text-lg font-semibold">{item.show.movie.title}</p>
               <p className="text-gray-400 text-sm">{timeFormat(item.show.movie.runtime)}</p>
-              <p className="text-gray-400 text-sm mt-auto">
-                {dateFormat(item.show.showDateTime)}
-              </p>
+              <p className="text-gray-400 text-sm mt-auto">{dateFormat(item.show.showDateTime)}</p>
             </div>
           </div>
 
@@ -61,7 +110,6 @@ const MyBookings = () => {
                 </button>
               )}
             </div>
-
             <div className='text-sm'>
               <p><span className='text-gray-400'>Total Tickets:</span> {item.bookedSeats.length}</p>
               <p><span className='text-gray-400'>Seat Number:</span> {item.bookedSeats.join(", ")}</p>
