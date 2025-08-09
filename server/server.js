@@ -9,7 +9,7 @@ import showRouter from './routes/showRoutes.js';
 import bookingRouter from './routes/bookingRoutes.js';
 import userRouter from './routes/userRoutes.js';
 import adminRouter from './routes/adminRoutes.js'; // ✅ Uncomment this
-import { stripeWebhooks } from './controllers/stripeWebHooks.js';
+import { stripeWebhooks } from './controllers/stripeWebhooks.js';
 
 const app = express();
 const port = 3000;
