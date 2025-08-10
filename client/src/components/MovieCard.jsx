@@ -1,7 +1,7 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { StarIcon } from 'lucide-react';
-import timeFormat from '../lib/TimeFormat';
+import timeFormat from '../lib/timeFormat.js';
 import { useAppContext } from '../context/AppContext';
 
 const MovieCard = ({ movie }) => {
