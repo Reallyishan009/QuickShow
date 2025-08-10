@@ -9,13 +9,14 @@ import { Toaster } from 'react-hot-toast'
 import Footer from './components/Footer'
 import Layout from './pages/admin/Layout'
 import AddShows from './pages/admin/AddShows'
-import Dashboard from './pages/admin/Dashboard'
+
 import ListShows from './pages/admin/ListShows'
 import ListBookings from './pages/admin/ListBookings'
 import { useAppContext } from './context/AppContext'
 import { SignIn } from '@clerk/clerk-react'
 import Loading from './components/Loading'
 import Navbar from './components/Navbar'
+import Dashboard from './pages/admin/Dashboard'
 
 const App = () => {
 
