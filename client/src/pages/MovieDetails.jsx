@@ -1,13 +1,13 @@
+// src/pages/MovieDetails.jsx
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { dummyDateTimeData, dummyShowsData } from '../assets/assets';
 import BlurCircle from '../components/BlurCircle';
 import { Heart, PlayCircleIcon, StarIcon } from 'lucide-react';
 import timeFormat from '../lib/timeFormat.js';
 import DateSelect from '../components/DateSelect';
 import MovieCard from '../components/MovieCard';
 import Loading from '../components/Loading';
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../context/AppContext.jsx';
 import toast from 'react-hot-toast';
 
 const MovieDetails = () => {
@@ -15,23 +15,15 @@ const MovieDetails = () => {
   const { id } = useParams();
   const [show, setShow] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isFavorite, setIsFavorite] = useState(false);
   const [dateTime, setDateTime] = useState({});
   
-  const { shows, axios, getToken, user, fetchFavouriteMovies, favouriteMovies, image_base_url } = useAppContext();
+  const { shows, axios, getToken, user, toggleFavorite, isFavorite, image_base_url } = useAppContext();
 
-  // Check if movie is in favorites
   useEffect(() => {
-    if (favouriteMovies && id && show) {
-      const isMovieInFavorites = favouriteMovies.some(movie => 
-        String(movie._id) === String(show._id) || 
-        String(movie.id) === String(show._id) ||
-        String(movie._id) === String(id) ||
-        String(movie.id) === String(id)
-      );
-      setIsFavorite(isMovieInFavorites);
+    if (id) {
+      getShow();
     }
-  }, [favouriteMovies, id, show]);
+  }, [id]);
 
   const getShow = async () => {
     try {
@@ -44,7 +36,6 @@ const MovieDetails = () => {
       
       if (response.data.success && response.data.movie) {
         setShow(response.data.movie);
-        // Set dateTime from API response
         setDateTime(response.data.dateTime || {});
       } else {
         toast.error('Failed to load movie details');
@@ -58,38 +49,21 @@ const MovieDetails = () => {
     }
   };
 
-  const handleFavourite = async () => {
-    try {
-      if (!user) {
+  // ✅ Super simple favorite handler - no backend calls!
+  const handleFavourite = () => {
+    if (!user) {
       toast.error('Please log in to add to favourites');
-        }
-      const response = await axios.post(
-        '/api/user/update-favorites',
-        { movieId: id },
-        { 
-          headers: { 
-            Authorization: `Bearer ${await getToken()}`
-          }
-        }
-      );
-      
-      if (data.success) {
-        await fetchFavouriteMovies();
-        toast.success(data.message)
-      } else {
-        toast.error('Failed to update favorites');
-      }
-      setIsFavorite(true);
-    } catch (error) {
-      console.error('Error:', error);
+      return;
     }
-  };
 
-  useEffect(() => {
-    if (id) {
-      getShow();
+    if (!show) {
+      toast.error('Movie data not available');
+      return;
     }
-  }, [id]);
+
+    // Just call the context function - no API calls, no hanging!
+    toggleFavorite(show);
+  };
 
   if (loading) {
     return <Loading />;
@@ -110,6 +84,9 @@ const MovieDetails = () => {
       </div>
     );
   }
+
+  // ✅ Check if current movie is favorite
+  const isCurrentlyFavorite = isFavorite(show._id);
 
   return (
     <div className='px-6 md:px-16 lg:px-40 pt-30 md:pt-50'>
@@ -154,16 +131,15 @@ const MovieDetails = () => {
             
             <button 
               onClick={handleFavourite} 
-              disabled={!show || !show._id}
-              className={`p-2.5 rounded-full transition cursor-pointer active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${
-                isFavorite 
+              className={`p-2.5 rounded-full transition cursor-pointer active:scale-95 ${
+                isCurrentlyFavorite 
                   ? 'bg-primary/20 hover:bg-primary/30' 
                   : 'bg-gray-700 hover:bg-gray-600'
               }`}
             >
               <Heart 
                 className={`w-5 h-5 transition-colors ${
-                      favouriteMovies.find(movie=> movie._id===id)
+                  isCurrentlyFavorite
                     ? 'fill-primary text-primary' 
                     : 'text-gray-300 hover:text-primary'
                 }`} 
@@ -196,7 +172,6 @@ const MovieDetails = () => {
         </div>
       </div>
 
-      {/* Fixed DateSelect section */}
       <div id="dateSelect">
         <DateSelect 
           dateTime={dateTime}

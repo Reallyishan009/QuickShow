@@ -2,10 +2,11 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
-    _id: { type: String, required: true }, // Clerk or external user ID as string
+    _id: { type: String, required: true }, // Clerk user ID as string
     name: { type: String, required: true },
-    email: { type: String, required: true, unique: true }, // Add unique constraint
-    image: { type: String }, // Optional; remove 'required' if you want to allow blank avatars
+    email: { type: String, required: true, unique: true },
+    image: { type: String }, 
+    favorites: [{ type: String }] // ✅ Added favorites array to store movie IDs
   },
   { timestamps: true }
 );

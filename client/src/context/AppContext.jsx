@@ -1,3 +1,4 @@
+// src/context/AppContext.jsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth, useUser } from '@clerk/clerk-react';
@@ -11,8 +12,19 @@ export const AppContext = createContext();
 export const AppProvider = ({ children }) => {
     const [isAdmin, setIsAdmin] = useState(false);
     const [shows, setShows] = useState([]);
-    const [favouriteMovies, setFavouriteMovies] = useState([]);
     const [trailers, setTrailers] = useState([]);
+    
+    // ✅ Initialize favorites with a function to avoid render-time execution
+    const [favouriteMovies, setFavouriteMovies] = useState(() => {
+        try {
+            const savedFavorites = localStorage.getItem('favoriteMovies');
+            return savedFavorites ? JSON.parse(savedFavorites) : [];
+        } catch (error) {
+            console.error('Error loading favorites from localStorage:', error);
+            localStorage.removeItem('favoriteMovies');
+            return [];
+        }
+    });
     
     const image_base_url = 'https://image.tmdb.org/t/p/w500';
 
@@ -20,6 +32,39 @@ export const AppProvider = ({ children }) => {
     const { getToken } = useAuth();
     const location = useLocation();
     const navigate = useNavigate();
+
+    // ✅ Simple add/remove favorite function
+    const toggleFavorite = (movie) => {
+        setFavouriteMovies(prev => {
+            const isAlreadyFavorite = prev.some(fav => fav._id === movie._id);
+            let newFavorites;
+            
+            if (isAlreadyFavorite) {
+                // Remove from favorites
+                newFavorites = prev.filter(fav => fav._id !== movie._id);
+                toast.success('Removed from favorites');
+            } else {
+                // Add to favorites
+                newFavorites = [...prev, movie];
+                toast.success('Added to favorites');
+            }
+            
+            // Save to localStorage
+            try {
+                localStorage.setItem('favoriteMovies', JSON.stringify(newFavorites));
+            } catch (error) {
+                console.error('Error saving favorites to localStorage:', error);
+                toast.error('Failed to save favorite');
+            }
+            
+            return newFavorites;
+        });
+    };
+
+    // ✅ Check if movie is favorite
+    const isFavorite = (movieId) => {
+        return favouriteMovies.some(movie => movie._id === movieId);
+    };
 
     // ✅ Fetch trailers through your secure backend API
     const fetchPopularTrailers = async () => {
@@ -36,40 +81,6 @@ export const AppProvider = ({ children }) => {
         } catch (error) {
             console.error('Error fetching trailers:', error);
             toast.error('Failed to fetch trailers');
-        }
-    };
-
-    // ✅ Fetch trailers for specific shows through backend
-    const fetchTrailersForShows = async () => {
-        try {
-            if (shows && shows.length > 0) {
-                const trailerPromises = shows.slice(0, 4).map(async (show) => {
-                    if (show.tmdb_id || show.id) {
-                        try {
-                            const response = await axios.get(`/api/tmdb/movie/${show.tmdb_id || show.id}/trailers`);
-                            return response.data.success ? response.data.trailers : [];
-                        } catch (error) {
-                            console.error(`Error fetching trailers for show ${show.id}:`, error);
-                            return [];
-                        }
-                    }
-                    return [];
-                });
-                
-                const trailerArrays = await Promise.all(trailerPromises);
-                const allTrailers = trailerArrays.flat().slice(0, 4);
-                
-                if (allTrailers.length > 0) {
-                    setTrailers(allTrailers);
-                } else {
-                    await fetchPopularTrailers();
-                }
-            } else {
-                await fetchPopularTrailers();
-            }
-        } catch (error) {
-            console.error('Error fetching show trailers:', error);
-            await fetchPopularTrailers();
         }
     };
 
@@ -104,32 +115,12 @@ export const AppProvider = ({ children }) => {
         }
     };
 
-    const fetchFavouriteMovies = async () => {
-        try {
-            const token = await getToken();
-            const { data } = await axios.get('/api/user/favorites', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            if (data.success) {
-                setFavouriteMovies(data.movies);
-            } else {
-                toast.error(data.message || 'Failed to fetch favourite movies');
-            }
-        } catch (error) {
-            console.error('Error fetching favourite movies:', error);
-            toast.error('Failed to fetch favourite movies');
-        }
-    };
-
     useEffect(() => {
         fetchShows();
     }, []);
 
-    // ✅ Fetch trailers after shows are loaded
     useEffect(() => {
         if (shows.length > 0) {
-            fetchTrailersForShows();
-        } else {
             fetchPopularTrailers();
         }
     }, [shows]);
@@ -137,10 +128,8 @@ export const AppProvider = ({ children }) => {
     useEffect(() => {
         if (user) {
             fetchIsAdmin();
-            fetchFavouriteMovies();
         } else {
             setIsAdmin(false);
-            setFavouriteMovies([]);
         }
     }, [user]);
 
@@ -150,11 +139,11 @@ export const AppProvider = ({ children }) => {
         shows,
         favouriteMovies,
         trailers,
-        fetchFavouriteMovies,
+        toggleFavorite,
+        isFavorite,
         fetchIsAdmin,
         fetchShows,
         fetchPopularTrailers,
-        fetchTrailersForShows,
         user,
         getToken,
         navigate,

@@ -18,16 +18,7 @@ userRouter.post('/update-favorites', updateFavorite);
 userRouter.get('/favorites', getFavorites);
 userRouter.get('/test-bookings', testBookings);
 // Add to userRouter.js
-userRouter.get('/db-test', async (req, res) => {
-  try {
-    console.log("[db-test] Testing database connection");
-    const count = await mongoose.connection.db.stats();
-    res.json({ success: true, message: "Database connected", stats: count });
-  } catch (error) {
-    console.error("[db-test] Database error:", error);
-    res.status(500).json({ success: false, message: error.message });
-  }
-});
+
 
 
 
