@@ -1,31 +1,22 @@
-// React and routing
-import { Route, Routes, useLocation } from 'react-router-dom'
-import { Toaster } from 'react-hot-toast'
-import { SignIn } from '@clerk/clerk-react'
-
-// Components
+import React from 'react'
 import Navbar from './components/Navbar'
-import Footer from './components/Footer'
-import Loading from './components/Loading'
-
-// Regular pages
+import { Route, Routes, useLocation } from 'react-router-dom'
 import Home from './pages/Home'
 import Movies from './pages/Movies'
 import MovieDetails from './pages/MovieDetails'
 import SeatLayout from './pages/SeatLayout'
 import MyBookings from './pages/MyBookings'
 import Favorite from './pages/Favorite'
-
-// Admin pages
+import { Toaster } from 'react-hot-toast'
+import Footer from './components/Footer'
 import Layout from './pages/admin/Layout'
 import Dashboard from './pages/admin/Dashboard'
 import AddShows from './pages/admin/AddShows'
 import ListShows from './pages/admin/ListShows'
 import ListBookings from './pages/admin/ListBookings'
-
-// Context (import last to avoid circular deps)
 import { useAppContext } from './context/AppContext'
-
+import { SignIn } from '@clerk/clerk-react'
+import Loading from './components/Loading'
 
 const App = () => {
 
