@@ -28,6 +28,7 @@ router.get('/popular-trailers', async (req, res) => {
                         movieId: movie.id,
                         title: movie.title,
                         videoUrl: `https://www.youtube.com/watch?v=${trailer.key}`,
+                        embedUrl: `https://www.youtube.com/embed/${trailer.key}`,
                         image: `https://image.tmdb.org/t/p/w500${movie.backdrop_path}`,
                         key: trailer.key
                     };
@@ -56,7 +57,6 @@ router.get('/popular-trailers', async (req, res) => {
     }
 });
 
-// Add route for specific movie trailers
 router.get('/movie/:movieId/trailers', async (req, res) => {
     try {
         const { movieId } = req.params;
@@ -76,6 +76,7 @@ router.get('/movie/:movieId/trailers', async (req, res) => {
                 movieId: movieId,
                 title: movie.title,
                 videoUrl: `https://www.youtube.com/watch?v=${trailer.key}`,
+                embedUrl: `https://www.youtube.com/embed/${trailer.key}`,
                 image: `https://image.tmdb.org/t/p/w500${movie.backdrop_path}`,
                 key: trailer.key
             }));

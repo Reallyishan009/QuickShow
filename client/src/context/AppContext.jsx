@@ -14,23 +14,23 @@ export const AppProvider = ({ children }) => {
     const [favouriteMovies, setFavouriteMovies] = useState([]);
     const [trailers, setTrailers] = useState([]);
     
-    // ✅ Keep image_base_url (safe to expose)
     const image_base_url = 'https://image.tmdb.org/t/p/w500';
-    // ❌ Remove tmdb_api_key (security risk)
 
     const { user } = useUser();
     const { getToken } = useAuth();
     const location = useLocation();
     const navigate = useNavigate();
 
-    // ✅ NEW: Fetch trailers through your secure backend API
+    // ✅ Fetch trailers through your secure backend API
     const fetchPopularTrailers = async () => {
         try {
             const response = await axios.get('/api/tmdb/popular-trailers');
             
             if (response.data.success) {
                 setTrailers(response.data.trailers);
+                console.log('Trailers fetched successfully:', response.data.trailers);
             } else {
+                console.error('Failed to fetch trailers:', response.data.message);
                 toast.error('Failed to fetch trailers');
             }
         } catch (error) {
@@ -39,7 +39,7 @@ export const AppProvider = ({ children }) => {
         }
     };
 
-    // ✅ NEW: Fetch trailers for specific shows through backend
+    // ✅ Fetch trailers for specific shows through backend
     const fetchTrailersForShows = async () => {
         try {
             if (shows && shows.length > 0) {
@@ -125,7 +125,7 @@ export const AppProvider = ({ children }) => {
         fetchShows();
     }, []);
 
-    // ✅ UPDATED: Fetch trailers after shows are loaded
+    // ✅ Fetch trailers after shows are loaded
     useEffect(() => {
         if (shows.length > 0) {
             fetchTrailersForShows();
@@ -149,18 +149,17 @@ export const AppProvider = ({ children }) => {
         isAdmin,
         shows,
         favouriteMovies,
-        trailers, // ✅ Keep trailers state
+        trailers,
         fetchFavouriteMovies,
         fetchIsAdmin,
         fetchShows,
-        fetchPopularTrailers, // ✅ NEW: Secure backend function
-        fetchTrailersForShows, // ✅ NEW: Secure backend function
+        fetchPopularTrailers,
+        fetchTrailersForShows,
         user,
         getToken,
         navigate,
         setIsAdmin,
         image_base_url
-        // ❌ Remove tmdb_api_key and fetchTrailers (insecure)
     };
 
     return (

@@ -5,24 +5,19 @@ import { PlayCircleIcon } from 'lucide-react';
 import { useAppContext } from '../context/AppContext.jsx';
 
 const TrailerSection = () => {
-  const { trailers } = useAppContext(); // ✅ Remove fetchPopularTrailers - it's called automatically in context
+  const { trailers } = useAppContext();
   const [currentTrailer, setCurrentTrailer] = useState(null);
 
-  // Set the first trailer as current when trailers are loaded
   useEffect(() => {
     if (trailers && trailers.length > 0 && !currentTrailer) {
       setCurrentTrailer(trailers[0]);
     }
   }, [trailers, currentTrailer]);
 
-  // ✅ ADDED: Reset current trailer when trailers change
-  useEffect(() => {
-    if (trailers && trailers.length > 0) {
-      setCurrentTrailer(trailers[0]);
-    }
-  }, [trailers]);
+  const handleTrailerSwitch = (trailer) => {
+    setCurrentTrailer(trailer);
+  };
 
-  // Handle case when no trailers are available
   if (!trailers || trailers.length === 0) {
     return (
       <div className='px-6 md:px-16 lg:px-24 xl:px-44 py-20 overflow-hidden'>
@@ -42,14 +37,15 @@ const TrailerSection = () => {
         <BlurCircle top='-100px' right='-100px' />
         <div className="mx-auto w-full max-w-[960px] aspect-video">
           {currentTrailer && (
-            <ReactPlayer
-              key={currentTrailer.id}
-              url={currentTrailer.videoUrl}
-              controls
-              playing={false}
+            <iframe
+              src={`https://www.youtube.com/embed/${currentTrailer.key}?rel=0&modestbranding=1&showinfo=0`}
               width="100%"
               height="100%"
-              className="react-player"
+              frameBorder="0"
+              allowFullScreen
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              className="rounded-lg"
+              title={currentTrailer.title}
             />
           )}
         </div>
@@ -59,10 +55,8 @@ const TrailerSection = () => {
         {trailers.map((trailer) => (
           <div
             key={trailer.id}
-            className={`relative hover:-translate-y-1 duration-300 transition cursor-pointer h-40 md:h-60 group ${
-              currentTrailer?.id === trailer.id ? 'ring-2 ring-primary' : ''
-            }`} // ✅ ADDED: Visual indicator for current trailer
-            onClick={() => setCurrentTrailer(trailer)}
+            className='relative opacity-100 hover:opacity-100 hover:-translate-y-1 duration-300 transition cursor-pointer h-40 md:h-60 group'
+            onClick={() => handleTrailerSwitch(trailer)}
           >
             <img
               src={trailer.image}
