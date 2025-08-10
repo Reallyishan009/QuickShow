@@ -1,5 +1,3 @@
-import React from 'react'
-import Navbar from './components/Navbar'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import Home from './pages/Home'
 import Movies from './pages/Movies'
@@ -17,6 +15,7 @@ import ListBookings from './pages/admin/ListBookings'
 import { useAppContext } from './context/AppContext'
 import { SignIn } from '@clerk/clerk-react'
 import Loading from './components/Loading'
+import Navbar from './components/Navbar'
 
 const App = () => {
 
