@@ -1,161 +1,90 @@
-// src/context/AppContext.jsx
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
-import { useAuth, useUser } from '@clerk/clerk-react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import toast from 'react-hot-toast';
+import { createContext, useContext, useEffect, useState } from "react";
+import axios from "axios";
+import { useAuth, useUser } from "@clerk/clerk-react";
+import { useLocation, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
-axios.defaults.baseURL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000';
+axios.defaults.baseURL = import.meta.env.VITE_BASE_URL
 
-export const AppContext = createContext();
+export const AppContext = createContext()
 
-export const AppProvider = ({ children }) => {
-    const [isAdmin, setIsAdmin] = useState(false);
-    const [shows, setShows] = useState([]);
-    const [trailers, setTrailers] = useState([]);
-    
-    // ✅ Initialize favorites with a function to avoid render-time execution
-    const [favouriteMovies, setFavouriteMovies] = useState(() => {
+export const AppProvider = ({ children })=>{
+
+    const [isAdmin, setIsAdmin] = useState(false)
+    const [shows, setShows] = useState([])
+    const [favoriteMovies, setFavoriteMovies] = useState([])
+
+    const image_base_url = import.meta.env.VITE_TMDB_IMAGE_BASE_URL;
+
+    const {user} = useUser()
+    const {getToken} = useAuth()
+    const location = useLocation()
+    const navigate = useNavigate()
+
+    const fetchIsAdmin = async ()=>{
         try {
-            const savedFavorites = localStorage.getItem('favoriteMovies');
-            return savedFavorites ? JSON.parse(savedFavorites) : [];
-        } catch (error) {
-            console.error('Error loading favorites from localStorage:', error);
-            localStorage.removeItem('favoriteMovies');
-            return [];
-        }
-    });
-    
-    const image_base_url = 'https://image.tmdb.org/t/p/w500';
+            const {data} = await axios.get('/api/admin/is-admin', {headers: {Authorization: `Bearer ${await getToken()}`}})
+            setIsAdmin(data.isAdmin)
 
-    const { user } = useUser();
-    const { getToken } = useAuth();
-    const location = useLocation();
-    const navigate = useNavigate();
-
-    // ✅ Simple add/remove favorite function
-    const toggleFavorite = (movie) => {
-        setFavouriteMovies(prev => {
-            const isAlreadyFavorite = prev.some(fav => fav._id === movie._id);
-            let newFavorites;
-            
-            if (isAlreadyFavorite) {
-                // Remove from favorites
-                newFavorites = prev.filter(fav => fav._id !== movie._id);
-                toast.success('Removed from favorites');
-            } else {
-                // Add to favorites
-                newFavorites = [...prev, movie];
-                toast.success('Added to favorites');
-            }
-            
-            // Save to localStorage
-            try {
-                localStorage.setItem('favoriteMovies', JSON.stringify(newFavorites));
-            } catch (error) {
-                console.error('Error saving favorites to localStorage:', error);
-                toast.error('Failed to save favorite');
-            }
-            
-            return newFavorites;
-        });
-    };
-
-    // ✅ Check if movie is favorite
-    const isFavorite = (movieId) => {
-        return favouriteMovies.some(movie => movie._id === movieId);
-    };
-
-    // ✅ Fetch trailers through your secure backend API
-    const fetchPopularTrailers = async () => {
-        try {
-            const response = await axios.get('/api/tmdb/popular-trailers');
-            
-            if (response.data.success) {
-                setTrailers(response.data.trailers);
-                console.log('Trailers fetched successfully:', response.data.trailers);
-            } else {
-                console.error('Failed to fetch trailers:', response.data.message);
-                toast.error('Failed to fetch trailers');
+            if(!data.isAdmin && location.pathname.startsWith('/admin')){
+                navigate('/')
+                toast.error('You are not authorized to access admin dashboard')
             }
         } catch (error) {
-            console.error('Error fetching trailers:', error);
-            toast.error('Failed to fetch trailers');
+            console.error(error)
         }
-    };
+    }
 
-    const fetchIsAdmin = async () => {
+    const fetchShows = async ()=>{
         try {
-            const token = await getToken();
-            const { data } = await axios.get('/api/admin/is-admin', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setIsAdmin(data.isAdmin);
-
-            if (!data.isAdmin && location.pathname.startsWith('/admin')) {
-                navigate('/');
-                toast.error('You are not authorized to access this page');
+            const { data } = await axios.get('/api/show/all')
+            if(data.success){
+                setShows(data.shows)
+            }else{
+                toast.error(data.message)
             }
         } catch (error) {
-            console.error('Error fetching admin status:', error);
-            setIsAdmin(false);
+            console.error(error)
         }
-    };
+    }
 
-    const fetchShows = async () => {
+    const fetchFavoriteMovies = async ()=>{
         try {
-            const { data } = await axios.get('/api/show/all');
-            if (data.success) {
-                setShows(data.shows);
-            } else {
-                toast.error(data.message || 'Failed to fetch shows');
+            const { data } = await axios.get('/api/user/favorites', {headers: {Authorization: `Bearer ${await getToken()}`}})
+
+            if(data.success){
+                setFavoriteMovies(data.movies)
+            }else{
+                toast.error(data.message)
             }
         } catch (error) {
-            console.error('Error fetching shows:', error);
+            console.error(error)
         }
-    };
+    }
 
-    useEffect(() => {
-        fetchShows();
-    }, []);
+    useEffect(()=>{
+        fetchShows()
+    },[])
 
-    useEffect(() => {
-        if (shows.length > 0) {
-            fetchPopularTrailers();
+    useEffect(()=>{
+        if(user){
+            fetchIsAdmin()
+            fetchFavoriteMovies()
         }
-    }, [shows]);
-
-    useEffect(() => {
-        if (user) {
-            fetchIsAdmin();
-        } else {
-            setIsAdmin(false);
-        }
-    }, [user]);
+    },[user])
 
     const value = {
         axios,
-        isAdmin,
-        shows,
-        favouriteMovies,
-        trailers,
-        toggleFavorite,
-        isFavorite,
         fetchIsAdmin,
-        fetchShows,
-        fetchPopularTrailers,
-        user,
-        getToken,
-        navigate,
-        setIsAdmin,
-        image_base_url
-    };
+        user, getToken, navigate, isAdmin, shows, 
+        favoriteMovies, fetchFavoriteMovies, image_base_url
+    }
 
     return (
         <AppContext.Provider value={value}>
-            {children}
+            { children }
         </AppContext.Provider>
-    );
-};
+    )
+}
 
-export const useAppContext = () => useContext(AppContext);
+export const useAppContext = ()=> useContext(AppContext)

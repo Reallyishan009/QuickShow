@@ -1,77 +1,56 @@
-// ✅ COMPLETE FIXED adminController.js:
-import { clerkClient } from "@clerk/express";
-import Booking from "../models/Booking.js";
+import Booking from "../models/Booking.js"
 import Show from "../models/Show.js";
 import User from "../models/User.js";
 
-//API TO CHECK IF USER IS ADMIN
-export const isAdmin = async (req, res) => {
-  try {
-    const { userId } = req.auth();
 
-    if (!userId) {
-      return res.json({ success: false, isAdmin: false });
+// API to check if user is admin
+export const isAdmin = async (req, res) =>{
+    res.json({success: true, isAdmin: true})
+}
+
+// API to get dashboard data
+export const getDashboardData = async (req, res) =>{
+    try {
+        const bookings = await Booking.find({isPaid: true});
+        const activeShows = await Show.find({showDateTime: {$gte: new Date()}}).populate('movie');
+
+        const totalUser = await User.countDocuments();
+
+        const dashboardData = {
+            totalBookings: bookings.length,
+            totalRevenue: bookings.reduce((acc, booking)=> acc + booking.amount, 0),
+            activeShows,
+            totalUser
+        }
+
+        res.json({success: true, dashboardData})
+    } catch (error) {
+        console.error(error);
+        res.json({success: false, message: error.message})
     }
+}
 
-    const user = await clerkClient.users.getUser(userId);
-    const isAdmin = user.privateMetadata?.role === "admin";
+// API to get all shows
+export const getAllShows = async (req, res) =>{
+    try {
+        const shows = await Show.find({showDateTime: { $gte: new Date() }}).populate('movie').sort({ showDateTime: 1 })
+        res.json({success: true, shows})
+    } catch (error) {
+        console.error(error);
+        res.json({success: false, message: error.message})
+    }
+}
 
-    res.json({ success: true, isAdmin });
-  } catch (error) {
-    console.error('Error checking admin status:', error);
-    res.json({ success: false, isAdmin: false });
-  }
-}; // ✅ FIXED: Added missing closing brace
-
-//API TO GET DASHBOARD DATA
-export const getDashboardData = async (req, res) => {
-  try {
-    const bookings = await Booking.find({ isPaid: true });
-    const activeShows = await Show.find({ showDateTime: { $gte: new Date() } }).populate('movie');
-    const totalUsers = await User.countDocuments();
-
-    const dashboardData = {
-      totalBookings: bookings.length,
-      totalRevenue: bookings.reduce((acc, booking) => acc + booking.amount, 0),
-      activeShows,
-      totalUsers
-    };
-
-    res.json({ success: true, data: dashboardData });
-  } catch (error) {
-    console.log(error.message);
-    res.status(500).json({ success: false, message: error.message });
-  }
-}; // ✅ FIXED: Added missing closing brace
-
-//API to get all shows
-export const getAllShows = async (req, res) => {
-  try {
-    const shows = await Show.find({ showDateTime: { $gte: new Date() } })
-      .populate('movie')
-      .sort({ showDateTime: 1 });
-
-    res.json({ success: true, shows });
-  } catch (error) {
-    console.log(error.message);
-    res.status(500).json({ success: false, message: error.message });
-  }
-}; // ✅ FIXED: Added missing closing brace
-
-//API to get all bookings
-export const getAllBookings = async (req, res) => {
-  try {
-    const bookings = await Booking.find()
-      .populate('user')
-      .populate({
-        path: 'show',
-        populate: { path: 'movie' }
-      })
-      .sort({ createdAt: -1 });
-
-    res.json({ success: true, bookings });
-  } catch (error) {
-    console.log(error.message);
-    res.status(500).json({ success: false, message: error.message });
-  }
-}; // ✅ FIXED: Added missing closing brace
+// API to get all bookings
+export const getAllBookings = async (req, res) =>{
+    try {
+        const bookings = await Booking.find({}).populate('user').populate({
+            path: "show",
+            populate: {path: "movie"}
+        }).sort({ createdAt: -1 })
+        res.json({success: true, bookings })
+    } catch (error) {
+        console.error(error);
+        res.json({success: false, message: error.message})
+    }
+}
