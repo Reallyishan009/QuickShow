@@ -15,8 +15,8 @@ import ListBookings from './pages/admin/ListBookings'
 import { useAppContext } from './context/AppContext'
 import { SignIn } from '@clerk/clerk-react'
 import Loading from './components/Loading'
-import Navbar from './components/Navbar'
 import Dashboard from './pages/admin/Dashboard'
+import Navbar from './components/Navbar'
 
 const App = () => {
 
