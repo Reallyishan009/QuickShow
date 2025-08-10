@@ -1,4 +1,3 @@
-import React from 'react'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import Home from './pages/Home'
 import Movies from './pages/Movies'
@@ -14,8 +13,10 @@ import ListShows from './pages/admin/ListShows'
 import ListBookings from './pages/admin/ListBookings'
 import { useAppContext } from './context/AppContext'
 import { SignIn } from '@clerk/clerk-react'
-import Loading from './components/Loading'
 import Dashboard from './pages/admin/Dashboard'
+
+import Loading from './components/Loading'
+
 import Navbar from './components/Navbar'
 
 const App = () => {
