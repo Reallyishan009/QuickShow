@@ -3,21 +3,18 @@ import axios from 'axios';
 
 const router = express.Router();
 
-// Get popular movie trailers
 router.get('/popular-trailers', async (req, res) => {
     try {
-        // Get popular movies first
         const moviesResponse = await axios.get(
-            `https://api.themoviedb.org/3/movie/popular?api_key=${process.env.TMDB_API_KEY}&page=1`
+            `https://api.themoviedb.org/3/movie/popular?api_key=${process.env.TMDB_API_KEY2}&page=1`
         );
         
         const popularMovies = moviesResponse.data.results.slice(0, 4);
         
-        // Get trailers for each movie
         const trailerPromises = popularMovies.map(async (movie) => {
             try {
                 const videosResponse = await axios.get(
-                    `https://api.themoviedb.org/3/movie/${movie.id}/videos?api_key=${process.env.TMDB_API_KEY}`
+                    `https://api.themoviedb.org/3/movie/${movie.id}/videos?api_key=${process.env.TMDB_API_KEY2}`
                 );
                 
                 const videos = videosResponse.data.results;
@@ -59,14 +56,14 @@ router.get('/popular-trailers', async (req, res) => {
     }
 });
 
-// Get trailers for specific movie
+// Add route for specific movie trailers
 router.get('/movie/:movieId/trailers', async (req, res) => {
     try {
         const { movieId } = req.params;
         
         const [videosResponse, movieResponse] = await Promise.all([
-            axios.get(`https://api.themoviedb.org/3/movie/${movieId}/videos?api_key=${process.env.TMDB_API_KEY}`),
-            axios.get(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${process.env.TMDB_API_KEY}`)
+            axios.get(`https://api.themoviedb.org/3/movie/${movieId}/videos?api_key=${process.env.TMDB_API_KEY2}`),
+            axios.get(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${process.env.TMDB_API_KEY2}`)
         ]);
         
         const videos = videosResponse.data.results;
