@@ -10,6 +10,7 @@ import bookingRouter from './routes/bookingRoutes.js';
 import userRouter from './routes/userRoutes.js';
 import adminRouter from './routes/adminRoutes.js'; // ✅ Uncomment this
 import { stripeWebhooks } from './controllers/stripeWebhooks.js';
+import tmdbRouter from './routes/tmdbRoutes.js';
 
 const app = express();
 const port = 3000;
@@ -38,5 +39,6 @@ app.use('/api/show', showRouter);
 app.use('/api/booking', bookingRouter);
 app.use('/api/user', userRouter);
 app.use('/api/admin', adminRouter); // ✅ Add this line
+app.use('/api/tmdb', tmdbRouter);
 
 app.listen(port, () => console.log(`Server listening at http://localhost:${port}`));

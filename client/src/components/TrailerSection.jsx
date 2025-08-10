@@ -5,7 +5,7 @@ import { PlayCircleIcon } from 'lucide-react';
 import { useAppContext } from '../context/AppContext.js';
 
 const TrailerSection = () => {
-  const { trailers, fetchPopularTrailers } = useAppContext();
+  const { trailers } = useAppContext(); // ✅ Remove fetchPopularTrailers - it's called automatically in context
   const [currentTrailer, setCurrentTrailer] = useState(null);
 
   // Set the first trailer as current when trailers are loaded
@@ -15,13 +15,20 @@ const TrailerSection = () => {
     }
   }, [trailers, currentTrailer]);
 
+  // ✅ ADDED: Reset current trailer when trailers change
+  useEffect(() => {
+    if (trailers && trailers.length > 0) {
+      setCurrentTrailer(trailers[0]);
+    }
+  }, [trailers]);
+
   // Handle case when no trailers are available
   if (!trailers || trailers.length === 0) {
     return (
       <div className='px-6 md:px-16 lg:px-24 xl:px-44 py-20 overflow-hidden'>
         <p className='text-gray-300 font-medium text-lg max-w-[960px] mx-auto'>Trailers</p>
         <div className='flex items-center justify-center h-64 text-gray-500'>
-          <p>Loading trailers...</p>
+          <div className="animate-pulse">Loading trailers...</div>
         </div>
       </div>
     );
@@ -52,7 +59,9 @@ const TrailerSection = () => {
         {trailers.map((trailer) => (
           <div
             key={trailer.id}
-            className='relative opacity-100 hover:opacity-100 hover:-translate-y-1 duration-300 transition cursor-pointer h-40 md:h-60 group'
+            className={`relative hover:-translate-y-1 duration-300 transition cursor-pointer h-40 md:h-60 group ${
+              currentTrailer?.id === trailer.id ? 'ring-2 ring-primary' : ''
+            }`} // ✅ ADDED: Visual indicator for current trailer
             onClick={() => setCurrentTrailer(trailer)}
           >
             <img

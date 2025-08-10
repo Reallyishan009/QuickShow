@@ -4,7 +4,6 @@ import { useAuth, useUser } from '@clerk/clerk-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
-
 axios.defaults.baseURL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000';
 
 export const AppContext = createContext();
@@ -14,90 +13,87 @@ export const AppProvider = ({ children }) => {
     const [shows, setShows] = useState([]);
     const [favouriteMovies, setFavouriteMovies] = useState([]);
     const [trailers, setTrailers] = useState([]);
-    const image_base_url = import.meta.env.VITE_TMDB_IMAGE_BASE_URL ;
-    const tmdb_api_key = import.meta.env.VITE_TMDB_API_KEY;
+    
+    // ✅ Keep image_base_url (safe to expose)
+    const image_base_url = 'https://image.tmdb.org/t/p/w500';
+    // ❌ Remove tmdb_api_key (security risk)
 
     const { user } = useUser();
     const { getToken } = useAuth();
     const location = useLocation();
-    const navigate = useNavigate(); // ✅ Fixed: Add the missing hook
+    const navigate = useNavigate();
 
-
-    const fetchTrailers = async (movieIds = []) => {
+    // ✅ NEW: Fetch trailers through your secure backend API
+    const fetchPopularTrailers = async () => {
         try {
-            const trailerPromises = movieIds.slice(0, 4).map(async (movieId) => {
-                const response = await axios.get(
-                    `https://api.themoviedb.org/3/movie/${movieId}/videos?api_key=${tmdb_api_key}`
-                );
-                
-                const videos = response.data.results;
-                const trailer = videos.find(video => 
-                    video.type === 'Trailer' && video.site === 'YouTube'
-                ) || videos[0]; // Fallback to first video if no trailer found
-
-                if (trailer) {
-                    // Also get movie details for thumbnail
-                    const movieResponse = await axios.get(
-                        `https://api.themoviedb.org/3/movie/${movieId}?api_key=${tmdb_api_key}`
-                    );
-                    
-                    return {
-                        id: trailer.id,
-                        movieId: movieId,
-                        title: movieResponse.data.title,
-                        videoUrl: `https://www.youtube.com/watch?v=${trailer.key}`,
-                        image: `${image_base_url}${movieResponse.data.backdrop_path}`,
-                        key: trailer.key
-                    };
-                }
-                return null;
-            });
-
-            const trailerResults = await Promise.all(trailerPromises);
-            const validTrailers = trailerResults.filter(trailer => trailer !== null);
-            setTrailers(validTrailers);
+            const response = await axios.get('/api/tmdb/popular-trailers');
+            
+            if (response.data.success) {
+                setTrailers(response.data.trailers);
+            } else {
+                toast.error('Failed to fetch trailers');
+            }
         } catch (error) {
             console.error('Error fetching trailers:', error);
             toast.error('Failed to fetch trailers');
         }
     };
 
-
-
-    const fetchPopularTrailers = async () => {
+    // ✅ NEW: Fetch trailers for specific shows through backend
+    const fetchTrailersForShows = async () => {
         try {
-            const response = await axios.get(
-                `https://api.themoviedb.org/3/movie/popular?api_key=${tmdb_api_key}&page=1`
-            );
-            
-            const popularMovieIds = response.data.results.slice(0, 4).map(movie => movie.id);
-            await fetchTrailers(popularMovieIds);
+            if (shows && shows.length > 0) {
+                const trailerPromises = shows.slice(0, 4).map(async (show) => {
+                    if (show.tmdb_id || show.id) {
+                        try {
+                            const response = await axios.get(`/api/tmdb/movie/${show.tmdb_id || show.id}/trailers`);
+                            return response.data.success ? response.data.trailers : [];
+                        } catch (error) {
+                            console.error(`Error fetching trailers for show ${show.id}:`, error);
+                            return [];
+                        }
+                    }
+                    return [];
+                });
+                
+                const trailerArrays = await Promise.all(trailerPromises);
+                const allTrailers = trailerArrays.flat().slice(0, 4);
+                
+                if (allTrailers.length > 0) {
+                    setTrailers(allTrailers);
+                } else {
+                    await fetchPopularTrailers();
+                }
+            } else {
+                await fetchPopularTrailers();
+            }
         } catch (error) {
-            console.error('Error fetching popular movies:', error);
-            toast.error('Failed to fetch popular trailers');
+            console.error('Error fetching show trailers:', error);
+            await fetchPopularTrailers();
         }
     };
 
     const fetchIsAdmin = async () => {
         try {
             const token = await getToken();
-            const { data } = await axios.get('/api/admin/is-admin', { // ✅ Fixed: correct endpoint
-                headers: { Authorization: `Bearer ${token}` }});
+            const { data } = await axios.get('/api/admin/is-admin', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             setIsAdmin(data.isAdmin);
 
             if (!data.isAdmin && location.pathname.startsWith('/admin')) {
-                navigate('/'); // ✅ This will now work
+                navigate('/');
                 toast.error('You are not authorized to access this page');
             }
         } catch (error) {
             console.error('Error fetching admin status:', error);
-            setIsAdmin(false); // ✅ Set to false on error
+            setIsAdmin(false);
         }
     };
 
     const fetchShows = async () => {
         try {
-            const { data } = await axios.get('/api/show/all'); // ✅ Fixed: correct endpoint
+            const { data } = await axios.get('/api/show/all');
             if (data.success) {
                 setShows(data.shows);
             } else {
@@ -111,11 +107,11 @@ export const AppProvider = ({ children }) => {
     const fetchFavouriteMovies = async () => {
         try {
             const token = await getToken();
-            const { data } = await axios.get('/api/user/favorites', { // ✅ Fixed: correct endpoint
+            const { data } = await axios.get('/api/user/favorites', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             if (data.success) {
-                setFavouriteMovies(data.movies); // ✅ Fixed: correct property name
+                setFavouriteMovies(data.movies);
             } else {
                 toast.error(data.message || 'Failed to fetch favourite movies');
             }
@@ -127,15 +123,22 @@ export const AppProvider = ({ children }) => {
 
     useEffect(() => {
         fetchShows();
-        fetchPopularTrailers(); // ✅ Fetch trailers on component mount
     }, []);
+
+    // ✅ UPDATED: Fetch trailers after shows are loaded
+    useEffect(() => {
+        if (shows.length > 0) {
+            fetchTrailersForShows();
+        } else {
+            fetchPopularTrailers();
+        }
+    }, [shows]);
 
     useEffect(() => {
         if (user) {
             fetchIsAdmin();
             fetchFavouriteMovies();
         } else {
-            // Reset states when user logs out
             setIsAdmin(false);
             setFavouriteMovies([]);
         }
@@ -146,18 +149,18 @@ export const AppProvider = ({ children }) => {
         isAdmin,
         shows,
         favouriteMovies,
+        trailers, // ✅ Keep trailers state
         fetchFavouriteMovies,
         fetchIsAdmin,
         fetchShows,
+        fetchPopularTrailers, // ✅ NEW: Secure backend function
+        fetchTrailersForShows, // ✅ NEW: Secure backend function
         user,
         getToken,
         navigate,
         setIsAdmin,
-        image_base_url,
-        tmdb_api_key,
-        trailers,
-        fetchTrailers, // ✅ Add fetchTrailers function
-        fetchPopularTrailers, // ✅ Add fetchPopularTrailers function
+        image_base_url
+        // ❌ Remove tmdb_api_key and fetchTrailers (insecure)
     };
 
     return (
@@ -167,5 +170,4 @@ export const AppProvider = ({ children }) => {
     );
 };
 
-// ✅ Fixed: Correct export syntax
 export const useAppContext = () => useContext(AppContext);
