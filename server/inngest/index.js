@@ -1,12 +1,14 @@
 // Remove this line completely - you don't need it
 // import { User as ClerkUser } from "@clerk/express";
 
+
 import { Inngest } from "inngest";
 import mongoose from "mongoose";
 import User from "../models/User.js";
 import Booking from "../models/Booking.js";
 import Show from "../models/Show.js";
 import sendEmail from "../configs/nodeMailer.js";
+
 
 const ensureDBConnection = async () => {
     if (mongoose.connection.readyState === 0) {
@@ -20,8 +22,10 @@ const ensureDBConnection = async () => {
     }
 };
 
+
 // Create a client to send and receive events
 export const inngest = new Inngest({ id: "movie-ticket-booking" });
+
 
 // Inngest function to save user data to database
 export const syncUserCreation = inngest.createFunction(
@@ -33,7 +37,7 @@ export const syncUserCreation = inngest.createFunction(
     },
     async ({ event }) => {
         try {
-             await ensureDBConnection();
+            await ensureDBConnection();
             const { id, first_name, last_name, email_addresses, image_url } = event.data;
             const userData = {
                 _id: id,
@@ -50,6 +54,7 @@ export const syncUserCreation = inngest.createFunction(
     }
 );
 
+
 export const syncUserDeletion = inngest.createFunction(
     {
         id: 'delete-user-from-clerk'
@@ -59,7 +64,7 @@ export const syncUserDeletion = inngest.createFunction(
     },
     async ({ event }) => {
         try {
-             await ensureDBConnection();
+            await ensureDBConnection();
             const { id } = event.data;
             await User.findByIdAndDelete(id);
             console.log(`User ${id} deleted successfully`);
@@ -70,6 +75,7 @@ export const syncUserDeletion = inngest.createFunction(
     }
 );
 
+
 export const syncUserUpdation = inngest.createFunction(
     {
         id: 'update-user-from-clerk'
@@ -79,7 +85,7 @@ export const syncUserUpdation = inngest.createFunction(
     },
     async ({ event }) => {
         try {
-             await ensureDBConnection();
+            await ensureDBConnection();
             const { id, first_name, last_name, email_addresses, image_url } = event.data;
             const userData = {
                 email: email_addresses[0].email_address,
@@ -95,7 +101,8 @@ export const syncUserUpdation = inngest.createFunction(
     }
 );
 
-//ingest function to cancel booking and release seats of show after 10mintues of booking created if payment is not made
+
+// Inngest function to cancel booking and release seats of show after 10 minutes of booking created if payment is not made
 const releaseSeatsAndDeleteBooking = inngest.createFunction(
     {id: 'release-seats-and-delete-booking'},
     {
@@ -105,9 +112,12 @@ const releaseSeatsAndDeleteBooking = inngest.createFunction(
         const tenMinutesLater = new Date(Date.now() + 10 * 60 * 1000);
         await step.sleepUntil('wait-for-10-minutes',tenMinutesLater);
 
-        await step.run('check-payment', async ({ run }) => {
+
+        await step.run('check-payment', async () => {
+            await ensureDBConnection();
             const bookingId = event.data.bookingId;
-            const booking = await Booking.findById(bookingId)
+            const booking = await Booking.findById(bookingId);
+
 
             //if payment is not made, release seats and delete booking
             if (!booking.isPaid) {
@@ -119,39 +129,42 @@ const releaseSeatsAndDeleteBooking = inngest.createFunction(
                 await show.save();
                 await Booking.findByIdAndDelete(booking._id);
             }
-        })
+        });
     }
-)
+);
 
-//ingest function to send email when user books a show
+
+// Inngest function to send email when user books a show
 const sendBookingConfirmationEmail = inngest.createFunction(
     {id:"send-booking-confirmation-email"},
     {event:"app/show.booked"},
     async({event,step})=>{
-        const {bookingId} = event.data;
-        const booking = await Booking.findById(bookingId).populate({
-            path:'show',
-            populate: {path: 'movie', model:'Movie'}
-        }).populate('user');
+        await step.run('send-email', async () => {
+            await ensureDBConnection();
+            const {bookingId} = event.data;
+            const booking = await Booking.findById(bookingId).populate({
+                path:'show',
+                populate: {path: 'movie', model:'Movie'}
+            }).populate('user');
 
-        await sendEmail ({
-            to: booking.user.email,
-            subject: `Payment Confirmation:" ${booking.show.movie.title}" booked`,
-            body: ` <div style="font-family: Arial,sans-serif;line-height:1.5;">
-                    <h2>Hi ${booking.user.name}</h2>
-                    <p>Your booking for<strong style="color: #F8565;">"${booking.show.movie.title}"
-                    </strong> is confirmed.</p>
-                    <p>
-                        <strong>Date:</strong> ${new Date(booking.show.showDateTime).toLocaleDateString('en-US',{timeZone:'Asia/Kolkata'})}<br/>
-                        <strong>Time:</strong> ${new Date(booking.show.showDateTime).toLocaleTimeString('en-US',{timeZone:'Asia/Kolkata'})}<br/>
-                    </p>
-                    <p>Enjoy the Show! 🫰🏻</p>
-                    <p>Thanks for booking with us!<br/>-QuickShow Team(Regards:Ishan Tripathi)</p>
-                    </div>`
-        })
+
+            await sendEmail ({
+                to: booking.user.email,
+                subject: `Payment Confirmation: "${booking.show.movie.title}" booked`,
+                body: ` <div style="font-family: Arial,sans-serif;line-height:1.5;">
+                        <h2>Hi ${booking.user.name}</h2>
+                        <p>Your booking for <strong style="color: #F8565;">"${booking.show.movie.title}"</strong> is confirmed.</p>
+                        <p>
+                            <strong>Date:</strong> ${new Date(booking.show.showDateTime).toLocaleDateString('en-US',{timeZone:'Asia/Kolkata'})}<br/>
+                            <strong>Time:</strong> ${new Date(booking.show.showDateTime).toLocaleTimeString('en-US',{timeZone:'Asia/Kolkata'})}<br/>
+                        </p>
+                        <p>Enjoy the Show! 🫰🏻</p>
+                        <p>Thanks for booking with us!<br/>-QuickShow Team(Regards:Ishan Tripathi)</p>
+                        </div>`
+            });
+        });
     }
+);
 
-
-)
 
 export const functions = [syncUserCreation, syncUserDeletion, syncUserUpdation,releaseSeatsAndDeleteBooking,sendBookingConfirmationEmail];
