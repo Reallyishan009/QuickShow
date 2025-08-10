@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import BlurCircle from './BlurCircle.jsx';
 import ReactPlayer from 'react-player';
 import { PlayCircleIcon } from 'lucide-react';
-import { useAppContext } from '../context/AppContext.js';
+import { useAppContext } from '../context/AppContext.jsx';
 
 const TrailerSection = () => {
   const { trailers } = useAppContext(); // ✅ Remove fetchPopularTrailers - it's called automatically in context
