@@ -13,8 +13,10 @@ const Footer = () => {
             style={{ height: '50px' }}
           />
           <p className="text-sm">
-            Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.
-          </p>
+            QuickShow revolutionizes movie ticket booking with real-time seat selection, secure payments, and dynamic trailers. Built with React, Node.js, and modern APIs for a seamless cinema experience.
+
+            Developed by Ishan Tripathi - Bringing innovative solutions to the entertainment industry.
+            </p>
           <div className="flex items-center gap-2 mt-4">
             <img src={assets.googlePlay} alt="Google Play Store" className="h-9 w-auto" />
             <img src={assets.appStore} alt="Apple App Store" className="h-9 w-auto" />
@@ -33,7 +35,7 @@ const Footer = () => {
           <div>
             <h2 className="font-semibold mb-5">Get in touch</h2>
             <div className="text-sm space-y-2">
-              <p>+91 0000000000</p>
+              <p>+91 9450038222</p>
               <p>reallyishan@example.com</p>
             </div>
           </div>
