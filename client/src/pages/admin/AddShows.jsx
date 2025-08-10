@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Title from '../../components/admin/Title';
 import { StarIcon, CheckIcon, DeleteIcon } from 'lucide-react';
-import { dummyShowsData } from '../../assets/assets';
 import Loading from '../../components/Loading';
-import { kConverter } from '../../lib/kconverter';
+import { kConverter } from '../../lib/kconverter.js';
 import { useAppContext } from '../../context/AppContext.jsx';
 import toast from 'react-hot-toast';
 
