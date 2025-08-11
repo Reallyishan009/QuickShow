@@ -7,11 +7,10 @@ export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),],
-    build: {
-    rollupOptions: {
-      external: [
-        '/src/components/Navbar.jsx'
-      ],
-    }
+    resolve: {
+    alias: {
+      '@': resolve(__dirname, 'src'),
+    },
   },
+    
 })
