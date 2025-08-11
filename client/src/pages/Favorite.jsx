@@ -1,7 +1,7 @@
 import React from 'react'
-import MovieCard from '../components/MovieCard'
-import BlurCircle from '../components/BlurCircle'
-import { useAppContext } from '../context/AppContext'
+import MovieCard from '../components/MovieCard.jsx'
+import BlurCircle from '../components/BlurCircle.jsx'
+import { useAppContext } from '../context/AppContext.jsx'
 
 const Favorite = () => {
 
