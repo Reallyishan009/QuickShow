@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { dummyDateTimeData, dummyShowsData } from '../assets/assets'
 import BlurCircle from '../components/BlurCircle'
-import { Heart, PlayCircleIcon, StarIcon } from 'lucide-react'
+import { Heart, PlayCircle, Star } from 'lucide-react'
 import timeFormat from '../lib/timeFormat'
 import DateSelect from '../components/DateSelect'
 import MovieCard from '../components/MovieCard'
@@ -59,7 +59,7 @@ const MovieDetails = () => {
           <p className='text-primary'>ENGLISH</p>
           <h1 className='text-4xl font-semibold max-w-96 text-balance'>{show.movie.title}</h1>
           <div className='flex items-center gap-2 text-gray-300'>
-            <StarIcon className="w-5 h-5 text-primary fill-primary"/>
+            <Star className="w-5 h-5 text-primary fill-primary"/>
             {show.movie.vote_average.toFixed(1)} User Rating
           </div>
 
@@ -71,7 +71,7 @@ const MovieDetails = () => {
 
           <div className='flex items-center flex-wrap gap-4 mt-4'>
             <button className='flex items-center gap-2 px-7 py-3 text-sm bg-gray-800 hover:bg-gray-900 transition rounded-md font-medium cursor-pointer active:scale-95'>
-              <PlayCircleIcon className="w-5 h-5"/>
+              <PlayCircle className="w-5 h-5"/>
               Watch Trailer
               </button>
             <a href="#dateSelect" className='px-10 py-3 text-sm bg-primary hover:bg-primary-dull transition rounded-md font-medium cursor-pointer active:scale-95'>Buy Tickets</a>

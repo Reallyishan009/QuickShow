@@ -1,4 +1,4 @@
-import { LayoutDashboardIcon, ListCollapseIcon, ListIcon, PlusSquareIcon } from 'lucide-react'
+import { LayoutDashboard, ListCollapse, List, SquarePlus } from 'lucide-react'
 import React from 'react'
 import { NavLink } from 'react-router-dom'
 import { assets } from '../../assets/assets'
@@ -12,10 +12,10 @@ const AdminSidebar = () => {
     }
 
     const adminNavlinks = [
-        { name: 'Dashboard', path: '/admin', icon: LayoutDashboardIcon },
-        { name: 'Add Shows', path: '/admin/add-shows', icon: PlusSquareIcon },
-        { name: 'List Shows', path: '/admin/list-shows', icon: ListIcon },
-        { name: 'List Bookings', path: '/admin/list-bookings', icon: ListCollapseIcon },
+        { name: 'Dashboard', path: '/admin', icon: LayoutDashboard },
+        { name: 'Add Shows', path: '/admin/add-shows', icon: SquarePlus },
+        { name: 'List Shows', path: '/admin/list-shows', icon: List },
+        { name: 'List Bookings', path: '/admin/list-bookings', icon: ListCollapse },
     ]
 
   return (
@@ -24,7 +24,7 @@ const AdminSidebar = () => {
       <p className='mt-2 text-base max-md:hidden'>{user.firstName} {user.lastName}</p>
       <div className='w-full'>
         {adminNavlinks.map((link, index)=>(
-            <NavLink key={index} to={link.path} end className={({ isActive }) => `relative flex items-center max-md:justify-center gap-2 w-full py-2.5 min-md:pl-10 first:mt-6 text-gray-400 ${isActive && 'bg-primary/15 text-primary group'}`}>
+            <NavLink key={index} to={link.path} end className={({ isActive }) => `relative flex items-center max-md:justify-center gap-2 w-full py-2.5 md:pl-10 first:mt-6 text-gray-400 ${isActive && 'bg-primary/15 text-primary group'}`}>
                 {({ isActive })=>(
                     <>
                         <link.icon className="w-5 h-5" />

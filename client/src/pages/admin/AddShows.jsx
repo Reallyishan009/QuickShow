@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { dummyShowsData } from '../../assets/assets';
 import Loading from '../../components/Loading';
 import Title from '../../components/admin/Title';
-import { CheckIcon, DeleteIcon, StarIcon } from 'lucide-react';
+import { Check, Trash, Star } from 'lucide-react';
 import { kConverter } from '../../lib/kConverter';
 import { useAppContext } from '../../context/AppContext';
 import toast from 'react-hot-toast';
@@ -111,7 +111,7 @@ const AddShows = () => {
                         <img src={image_base_url + movie.poster_path} alt="" className="w-full object-cover brightness-90" />
                         <div className="text-sm flex items-center justify-between p-2 bg-black/70 w-full absolute bottom-0 left-0">
                                     <p className="flex items-center gap-1 text-gray-400">
-                                        <StarIcon className="w-4 h-4 text-primary fill-primary" />
+                                        <Star className="w-4 h-4 text-primary fill-primary" />
                                         {movie.vote_average.toFixed(1)}
                                     </p>
                                     <p className="text-gray-300">{kConverter(movie.vote_count)} Votes</p>
@@ -119,7 +119,7 @@ const AddShows = () => {
                     </div>
                     {selectedMovie === movie.id && (
                         <div className="absolute top-2 right-2 flex items-center justify-center bg-primary h-6 w-6 rounded">
-                            <CheckIcon className="w-4 h-4 text-white" strokeWidth={2.5} />
+                            <Check className="w-4 h-4 text-white" strokeWidth={2.5} />
                         </div>
                     )}
                     <p className="font-medium truncate">{movie.title}</p>
@@ -161,7 +161,7 @@ const AddShows = () => {
                             {times.map((time) => (
                                 <div key={time} className="border border-primary px-2 py-1 flex items-center rounded" >
                                     <span>{time}</span>
-                                    <DeleteIcon onClick={() => handleRemoveTime(date, time)} width={15} className="ml-2 text-red-500 hover:text-red-700 cursor-pointer" />
+                                    <Trash onClick={() => handleRemoveTime(date, time)} width={15} className="ml-2 text-red-500 hover:text-red-700 cursor-pointer" />
                                 </div>
                             ))}
                         </div>

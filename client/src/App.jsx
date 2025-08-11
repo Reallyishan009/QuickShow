@@ -9,7 +9,6 @@ import { Toaster } from 'react-hot-toast'
 import Footer from './components/Footer'
 import Layout from './pages/admin/Layout'
 import AddShows from './pages/admin/AddShows'
-
 import ListShows from './pages/admin/ListShows'
 import ListBookings from './pages/admin/ListBookings'
 import { useAppContext } from './context/AppContext'
@@ -39,7 +38,7 @@ const App = () => {
         <Route path='/favorite' element={<Favorite/>} />
         <Route path='/admin/*' element={user ? <Layout/> : (
           <div className='min-h-screen flex justify-center items-center'>
-            <SignIn fallbackRedirectUrl={'/admin'} />
+            <SignIn afterSignInUrl={'/admin'} />
           </div>
         )}>
           <Route index element={<Dashboard/>}/>

@@ -1,4 +1,4 @@
-import { ChartLineIcon, CircleDollarSignIcon, PlayCircleIcon, StarIcon, UsersIcon } from 'lucide-react';
+import { ChartLine, CircleDollarSign, PlayCircle, Star, Users } from 'lucide-react';
 import React, { useEffect, useState } from 'react'
 import { dummyDashboardData } from '../../assets/assets';
 import Loading from '../../components/Loading';
@@ -23,10 +23,10 @@ const Dashboard = () => {
     const [loading, setLoading] = useState(true);
 
     const dashboardCards = [
-        { title: "Total Bookings", value: dashboardData.totalBookings || "0", icon: ChartLineIcon },
-        { title: "Total Revenue", value: currency + dashboardData.totalRevenue || "0", icon: CircleDollarSignIcon },
-        { title: "Active Shows", value: dashboardData.activeShows.length || "0", icon: PlayCircleIcon },
-        { title: "Total Users", value: dashboardData.totalUser || "0", icon: UsersIcon }
+        { title: "Total Bookings", value: dashboardData.totalBookings || "0", icon: ChartLine },
+        { title: "Total Revenue", value: currency + dashboardData.totalRevenue || "0", icon: CircleDollarSign },
+        { title: "Active Shows", value: dashboardData.activeShows.length || "0", icon: PlayCircle },
+        { title: "Total Users", value: dashboardData.totalUser || "0", icon: Users }
     ]
 
     const fetchDashboardData = async () => {
@@ -78,7 +78,7 @@ const Dashboard = () => {
                         <div className="flex items-center justify-between px-2">
                             <p className="text-lg font-medium">{currency} {show.showPrice}</p>
                             <p className="flex items-center gap-1 text-sm text-gray-400 mt-1 pr-1">
-                                <StarIcon className="w-4 h-4 text-primary fill-primary" />
+                                <Star className="w-4 h-4 text-primary fill-primary" />
                                 {show.movie.vote_average.toFixed(1)}
                             </p>
                         </div>
