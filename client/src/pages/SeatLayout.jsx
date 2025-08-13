@@ -83,6 +83,11 @@ const SeatLayout = () => {
 
         if(!selectedTime || !selectedSeats.length) return toast.error('Please select a time and seats');
 
+        // Show payment info before redirecting to Stripe
+        if (window.showTestPaymentInfo) {
+          window.showTestPaymentInfo()
+        }
+
         const {data} = await axios.post('/api/booking/create', {showId: selectedTime.showId, selectedSeats}, {headers: { Authorization: `Bearer ${await getToken()}` }});
 
         if (data.success){
