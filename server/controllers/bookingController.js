@@ -69,7 +69,7 @@ export const createBooking = async (req, res)=>{
          }]
 
          const session = await stripeInstance.checkout.sessions.create({
-            success_url: `${origin}/loading/my-bookings`,
+            success_url: `${origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${origin}/my-bookings`,
             line_items: line_items,
             mode: 'payment',
@@ -111,5 +111,80 @@ export const getOccupiedSeats = async (req, res)=>{
     } catch (error) {
         console.log(error.message);
         res.json({success: false, message: error.message})
+    }
+}
+
+// Verify payment and update booking status
+export const verifyPayment = async (req, res) => {
+    try {
+        const { userId } = req.auth();
+        const { sessionId } = req.body;
+
+        if (!sessionId) {
+            return res.json({ success: false, message: 'Session ID is required' });
+        }
+
+        // Initialize Stripe
+        const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY);
+        
+        // Retrieve the session from Stripe
+        const session = await stripeInstance.checkout.sessions.retrieve(sessionId);
+        
+        if (!session) {
+            return res.json({ success: false, message: 'Invalid session' });
+        }
+
+        // Get booking ID from session metadata
+        const bookingId = session.metadata.bookingId;
+        
+        // Find the booking
+        const booking = await Booking.findById(bookingId).populate({
+            path: 'show',
+            populate: { path: 'movie' }
+        });
+
+        if (!booking) {
+            return res.json({ success: false, message: 'Booking not found' });
+        }
+
+        // Check if payment was successful
+        if (session.payment_status === 'paid' && !booking.isPaid) {
+            // Update booking status
+            await Booking.findByIdAndUpdate(bookingId, {
+                isPaid: true,
+                paymentLink: ""
+            });
+
+            // Send confirmation email
+            await inngest.send({
+                name: "app/show.booked",
+                data: { bookingId: bookingId }
+            });
+
+            console.log(`✅ Payment verified and booking updated: ${bookingId}`);
+        }
+
+        // Return booking details
+        const updatedBooking = await Booking.findById(bookingId).populate({
+            path: 'show',
+            populate: { path: 'movie' }
+        });
+
+        res.json({
+            success: true,
+            booking: {
+                id: updatedBooking._id,
+                movieTitle: updatedBooking.show.movie.title,
+                amount: updatedBooking.amount,
+                seats: updatedBooking.bookedSeats,
+                isPaid: updatedBooking.isPaid,
+                showDateTime: updatedBooking.show.showDateTime
+            },
+            paymentStatus: session.payment_status
+        });
+
+    } catch (error) {
+        console.error('Payment verification error:', error);
+        res.json({ success: false, message: error.message });
     }
 }

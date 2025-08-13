@@ -54,7 +54,26 @@ const MyBookings = () => {
       <div>
         <BlurCircle bottom="0px" left="600px"/>
       </div>
-      <h1 className='text-lg font-semibold mb-4'>My Bookings</h1>
+      <div className='flex justify-between items-center mb-6'>
+        <h1 className='text-lg font-semibold'>My Bookings</h1>
+        <button 
+          onClick={() => window.location.reload()}
+          className='px-4 py-2 bg-primary hover:bg-primary-dull text-white text-sm rounded-lg transition-colors'
+        >
+          Refresh Bookings
+        </button>
+      </div>
+
+      {/* Test Payment Info */}
+      <div className='bg-green-600/20 border border-green-500/30 rounded-lg p-4 mb-6'>
+        <h3 className='text-white font-semibold mb-2'>✅ Payment Issues? Try This:</h3>
+        <p className='text-green-200 text-sm mb-2'>
+          If you paid but still see "Pay Now", visit: <strong>/debug</strong> page to manually fix your booking.
+        </p>
+        <p className='text-green-200 text-sm'>
+          Or wait 30 seconds for auto-sync to update your payment status.
+        </p>
+      </div>
 
       {bookings.filter(item => item && item.show && item.show.movie).map((item,index)=>(
         <div key={index} className='flex flex-col md:flex-row justify-between bg-primary/8 border border-primary/20 rounded-lg mt-4 p-2 max-w-3xl'>

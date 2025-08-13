@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { assets, dummyDateTimeData, dummyShowsData } from '../assets/assets'
 import Loading from '../components/Loading.jsx'
-import { ArrowRight, Clock } from 'lucide-react'
+import { ArrowRight, Clock, CreditCard } from 'lucide-react'
 import isoTimeFormat from '../lib/isoTimeFormat'
 import BlurCircle from '../components/BlurCircle.jsx'
 import toast from 'react-hot-toast'
@@ -106,7 +106,23 @@ const SeatLayout = () => {
   },[selectedTime])
 
   return show ? (
-    <div className='flex flex-col md:flex-row px-6 md:px-16 lg:px-40 py-30 md:pt-50'>
+    <div className='px-6 md:px-16 lg:px-40 py-30 md:pt-50'>
+      {/* Test Payment Banner */}
+      <div className='bg-blue-600/20 border border-blue-500/30 rounded-lg p-4 mb-6 max-w-4xl mx-auto'>
+        <div className='flex items-center gap-3'>
+          <div className='bg-blue-600 p-2 rounded-full'>
+            <CreditCard className='w-5 h-5 text-white' />
+          </div>
+          <div>
+            <h3 className='text-white font-semibold'>Test Mode - Use Dummy Card Details</h3>
+            <p className='text-blue-200 text-sm'>
+              Card: <strong>4242 4242 4242 4242</strong> | Expiry: <strong>12/34</strong> | CVC: <strong>123</strong> | ZIP: <strong>12345</strong>
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <div className='flex flex-col md:flex-row'>
       {/* Available Timings */}
       <div className='w-60 bg-primary/10 border border-primary/20 rounded-lg py-10 h-max md:sticky md:top-30'>
         <p className='text-lg font-semibold px-6'>Available Timings</p>

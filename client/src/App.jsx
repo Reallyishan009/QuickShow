@@ -9,6 +9,7 @@ import Favorite from './pages/Favorite.jsx'
 import Releases from './pages/Releases.jsx'
 import Theaters from './pages/Theaters.jsx'
 import Debug from './pages/Debug.jsx'
+import PaymentSuccess from './pages/PaymentSuccess.jsx'
 import { Toaster } from 'react-hot-toast'
 import Footer from './components/Footer.jsx'
 import Layout from './pages/admin/Layout.jsx'
@@ -20,6 +21,7 @@ import { SignIn } from '@clerk/clerk-react'
 import Loading from './components/Loading.jsx'
 import Navbar from './components/NavBar.jsx'
 import Dashboard from './pages/admin/DashBoard.jsx'
+import TestPaymentInfo from './components/TestPaymentInfo.jsx'
 
 const App = () => {
 
@@ -30,6 +32,7 @@ const App = () => {
   return (
     <>
       <Toaster />
+      <TestPaymentInfo />
       {!isAdminRoute && <Navbar/>}
       <Routes>
         <Route path='/' element={<Home/>} />
@@ -43,6 +46,7 @@ const App = () => {
         <Route path='/theaters' element={<Theaters/>} />
         <Route path='/favorite' element={<Favorite/>} />
         <Route path='/debug' element={<Debug/>} />
+        <Route path='/payment-success' element={<PaymentSuccess/>} />
         <Route path='/admin/*' element={user ? <Layout/> : (
           <div className='min-h-screen flex justify-center items-center'>
             <SignIn afterSignInUrl={'/admin'} />
