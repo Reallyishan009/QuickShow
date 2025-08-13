@@ -107,20 +107,6 @@ const SeatLayout = () => {
 
   return show ? (
     <div className='px-6 md:px-16 lg:px-40 py-30 md:pt-50'>
-      {/* Test Payment Banner */}
-      <div className='bg-blue-600/20 border border-blue-500/30 rounded-lg p-4 mb-6 max-w-4xl mx-auto'>
-        <div className='flex items-center gap-3'>
-          <div className='bg-blue-600 p-2 rounded-full'>
-            <CreditCard className='w-5 h-5 text-white' />
-          </div>
-          <div>
-            <h3 className='text-white font-semibold'>Test Mode - Use Dummy Card Details</h3>
-            <p className='text-blue-200 text-sm'>
-              Card: <strong>4242 4242 4242 4242</strong> | Expiry: <strong>12/34</strong> | CVC: <strong>123</strong> | ZIP: <strong>12345</strong>
-            </p>
-          </div>
-        </div>
-      </div>
       
       <div className='flex flex-col md:flex-row'>
       {/* Available Timings */}
