@@ -11,6 +11,8 @@
 
 QuickShow is a comprehensive movie ticket booking platform inspired by BookMyShow, designed to provide users with a seamless cinema experience. From browsing the latest movies to booking seats and making payments, QuickShow handles the entire movie-going journey.
 
+Live Link: QuickShow[https://quickshow-sigma.vercel.app/]
+
 ## ✨ Key Features
 
 ### 🎭 **For Movie Lovers**
