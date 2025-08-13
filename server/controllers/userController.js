@@ -12,7 +12,16 @@ export const getUserBookings = async (req, res)=>{
             path: "show",
             populate: {path: "movie"}
         }).sort({createdAt: -1 })
-        res.json({success: true, bookings})
+
+        // Filter out bookings with missing show or movie data
+        const validBookings = bookings.filter(booking => 
+            booking.show && 
+            booking.show.movie && 
+            booking.bookedSeats && 
+            booking.bookedSeats.length > 0
+        )
+
+        res.json({success: true, bookings: validBookings})
     } catch (error) {
         console.error(error.message);
         res.json({ success: false, message: error.message });
