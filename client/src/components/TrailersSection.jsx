@@ -19,6 +19,13 @@ const TrailersSection = () => {
             // Get trailers for the first 4 shows
             for (let i = 0; i < Math.min(4, shows.length); i++) {
                 const show = shows[i]
+                
+                // Check if show and show.movie exist
+                if (!show || !show.movie || !show.movie.id || !show.movie.title) {
+                    console.log('Invalid show data:', show)
+                    continue
+                }
+                
                 try {
                     const response = await axios.get(
                         `https://api.themoviedb.org/3/movie/${show.movie.id}/videos?api_key=${import.meta.env.VITE_TMDB_API_KEY || '6be9d0c3873af0899ce409eb2de46af2'}`
@@ -39,7 +46,7 @@ const TrailersSection = () => {
                         })
                     }
                 } catch (error) {
-                    console.log(`Error fetching trailer for ${show.movie.title}:`, error)
+                    console.log(`Error fetching trailer for ${show.movie?.title || 'Unknown movie'}:`, error)
                 }
             }
             
