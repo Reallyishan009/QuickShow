@@ -7,6 +7,7 @@ import timeFormat from '../lib/timeFormat'
 import DateSelect from '../components/DateSelect.jsx'
 import MovieCard from '../components/MovieCard.jsx'
 import Loading from '../components/Loading.jsx'
+import TrailerPlayer from '../components/TrailerPlayer.jsx'
 import { useAppContext } from '../context/AppContext'
 import toast from 'react-hot-toast'
 
@@ -15,6 +16,7 @@ const MovieDetails = () => {
   const navigate = useNavigate()
   const {id} = useParams()
   const [show, setShow] = useState(null)
+  const [showTrailer, setShowTrailer] = useState(false)
 
   const {shows, axios, getToken, user, fetchFavoriteMovies, favoriteMovies, image_base_url} = useAppContext()
 
@@ -70,10 +72,13 @@ const MovieDetails = () => {
           </p>
 
           <div className='flex items-center flex-wrap gap-4 mt-4'>
-            <button className='flex items-center gap-2 px-7 py-3 text-sm bg-gray-800 hover:bg-gray-900 transition rounded-md font-medium cursor-pointer active:scale-95'>
+            <button 
+              onClick={() => setShowTrailer(!showTrailer)}
+              className='flex items-center gap-2 px-7 py-3 text-sm bg-gray-800 hover:bg-gray-900 transition rounded-md font-medium cursor-pointer active:scale-95'
+            >
               <PlayCircle className="w-5 h-5"/>
-              Watch Trailer
-              </button>
+              {showTrailer ? 'Hide Trailer' : 'Watch Trailer'}
+            </button>
             <a href="#dateSelect" className='px-10 py-3 text-sm bg-primary hover:bg-primary-dull transition rounded-md font-medium cursor-pointer active:scale-95'>Buy Tickets</a>
             <button onClick={handleFavorite} className='bg-gray-700 p-2.5 rounded-full transition cursor-pointer active:scale-95'>
               <Heart className={`w-5 h-5 ${favoriteMovies.find(movie => movie._id === id) ? 'fill-primary text-primary' : ""} `}/>
@@ -92,6 +97,16 @@ const MovieDetails = () => {
             </div>
           ))}
         </div>
+      </div>
+
+      {/* Trailer Player Section */}
+      <div className='mt-12'>
+        <TrailerPlayer 
+          movieId={show.movie.id}
+          movieTitle={show.movie.title}
+          onClose={() => setShowTrailer(false)}
+          isVisible={showTrailer}
+        />
       </div>
 
       <DateSelect dateTime={show.dateTime} id={id}/>
