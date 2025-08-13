@@ -99,17 +99,17 @@ const MovieDetails = () => {
         </div>
       </div>
 
-      {/* Trailer Player Section */}
+      <DateSelect dateTime={show.dateTime} id={id}/>
+
+      {/* Trailer Player Section - positioned after DateSelect and before "You May Also Like" */}
       <div className='mt-12'>
         <TrailerPlayer 
-          movieId={show.movie.id}
+          movieId={show.movie._id}
           movieTitle={show.movie.title}
           onClose={() => setShowTrailer(false)}
           isVisible={showTrailer}
         />
       </div>
-
-      <DateSelect dateTime={show.dateTime} id={id}/>
 
       <p className='text-lg font-medium mt-20 mb-8'>You May Also Like</p>
       <div className='flex flex-wrap max-sm:justify-center gap-8'>

@@ -3,6 +3,7 @@ import ReactPlayer from 'react-player'
 import BlurCircle from './BlurCircle'
 import { PlayCircle } from 'lucide-react'
 import { useAppContext } from '../context/AppContext'
+import { dummyTrailers } from '../assets/assets'
 import axios from 'axios'
 
 const TrailersSection = () => {
@@ -16,19 +17,19 @@ const TrailersSection = () => {
             setLoading(true)
             const trailersData = []
             
-            // Get trailers for the first 4 shows
+            // Get trailers for the first 4 movies
             for (let i = 0; i < Math.min(4, shows.length); i++) {
-                const show = shows[i]
+                const movie = shows[i]
                 
-                // Check if show and show.movie exist
-                if (!show || !show.movie || !show.movie.id || !show.movie.title) {
-                    console.log('Invalid show data:', show)
+                // Check if movie exists and has required properties
+                if (!movie || !movie._id || !movie.title) {
+                    console.log('Invalid movie data:', movie)
                     continue
                 }
                 
                 try {
                     const response = await axios.get(
-                        `https://api.themoviedb.org/3/movie/${show.movie.id}/videos?api_key=${import.meta.env.VITE_TMDB_API_KEY || '6be9d0c3873af0899ce409eb2de46af2'}`
+                        `https://api.themoviedb.org/3/movie/${movie._id}/videos?api_key=${import.meta.env.VITE_TMDB_API_KEY || '6be9d0c3873af0899ce409eb2de46af2'}`
                     )
                     
                     const videos = response.data.results
@@ -38,24 +39,51 @@ const TrailersSection = () => {
                     
                     if (trailer) {
                         trailersData.push({
-                            id: show.movie.id,
-                            title: show.movie.title,
+                            id: movie._id,
+                            title: movie.title,
                             image: `https://img.youtube.com/vi/${trailer.key}/maxresdefault.jpg`,
                             videoUrl: `https://www.youtube.com/watch?v=${trailer.key}`,
-                            poster: show.movie.poster_path
+                            poster: movie.poster_path
                         })
                     }
                 } catch (error) {
-                    console.log(`Error fetching trailer for ${show.movie?.title || 'Unknown movie'}:`, error)
+                    console.log(`Error fetching trailer for ${movie?.title || 'Unknown movie'}:`, error)
                 }
             }
             
             setTrailers(trailersData)
             if (trailersData.length > 0) {
                 setCurrentTrailer(trailersData[0])
+            } else {
+                // Fallback to dummy trailers if no real trailers found
+                setTrailers(dummyTrailers.map((trailer, index) => ({
+                    id: `dummy-${index}`,
+                    title: `Featured Movie ${index + 1}`,
+                    image: trailer.image,
+                    videoUrl: trailer.videoUrl
+                })))
+                setCurrentTrailer(dummyTrailers[0] ? {
+                    id: 'dummy-0',
+                    title: 'Featured Movie 1',
+                    image: dummyTrailers[0].image,
+                    videoUrl: dummyTrailers[0].videoUrl
+                } : null)
             }
         } catch (error) {
             console.error('Error fetching trailers:', error)
+            // Fallback to dummy trailers on error
+            setTrailers(dummyTrailers.map((trailer, index) => ({
+                id: `dummy-${index}`,
+                title: `Featured Movie ${index + 1}`,
+                image: trailer.image,
+                videoUrl: trailer.videoUrl
+            })))
+            setCurrentTrailer(dummyTrailers[0] ? {
+                id: 'dummy-0',
+                title: 'Featured Movie 1',
+                image: dummyTrailers[0].image,
+                videoUrl: dummyTrailers[0].videoUrl
+            } : null)
         } finally {
             setLoading(false)
         }
