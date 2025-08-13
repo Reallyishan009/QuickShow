@@ -188,8 +188,8 @@ const Theaters = () => {
       
       {/* Header */}
       <div className='mb-8'>
-        <h1 className='text-4xl font-bold text-white mb-4'>Theaters Near You</h1>
-        <p className='text-gray-400 text-lg'>Find the best cinemas and book your favorite movies</p>
+        <h1 className='text-4xl font-bold text-white mb-4'>Theaters Near You(this is just for show)</h1>
+        <p className='text-gray-400 text-lg'>(Actual booking will happen on Movies page [click through navbar])Find the best cinemas and book your favorite movies</p>
       </div>
 
       {/* City Filter */}
