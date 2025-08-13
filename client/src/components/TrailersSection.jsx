@@ -135,11 +135,11 @@ const TrailersSection = () => {
                 )}
             </div>
 
-            <div className='group grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 mt-8 max-w-3xl mx-auto'>
+            <div className='group grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 mt-8 max-w-5xl mx-auto'>
                 {trailers.map((trailer) => (
                     <div 
                         key={trailer.id} 
-                        className={`relative group-hover:not-hover:opacity-50 hover:-translate-y-1 duration-300 transition max-md:h-60 md:max-h-60 cursor-pointer rounded-lg overflow-hidden ${
+                        className={`relative group-hover:not-hover:opacity-50 hover:-translate-y-1 duration-300 transition h-72 md:h-80 cursor-pointer rounded-lg overflow-hidden ${
                             currentTrailer?.id === trailer.id ? 'ring-2 ring-primary' : ''
                         }`} 
                         onClick={() => setCurrentTrailer(trailer)}
@@ -149,9 +149,9 @@ const TrailersSection = () => {
                             alt={`${trailer.title} trailer`} 
                             className='rounded-lg w-full h-full object-cover brightness-75'
                         />
-                        <PlayCircle strokeWidth={1.6} className="absolute top-1/2 left-1/2 w-5 md:w-8 h-5 md:h-8 transform -translate-x-1/2 -translate-y-1/2 text-white"/>
-                        <div className='absolute bottom-2 left-2 right-2'>
-                            <p className='text-white text-xs font-medium truncate'>{trailer.title}</p>
+                        <PlayCircle strokeWidth={1.6} className="absolute top-1/2 left-1/2 w-8 md:w-12 h-8 md:h-12 transform -translate-x-1/2 -translate-y-1/2 text-white"/>
+                        <div className='absolute bottom-3 left-3 right-3'>
+                            <p className='text-white text-sm md:text-base font-medium truncate'>{trailer.title}</p>
                         </div>
                     </div>
                 ))}

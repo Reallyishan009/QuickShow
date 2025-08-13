@@ -16,6 +16,7 @@ Live Link: QuickShow[https://quickshow-sigma.vercel.app/]
 ## ✨ Key Features
 
 ### 🎭 **For Movie Lovers**
+
 - **🎬 Browse Latest Movies** - Discover now-showing movies with rich details
 - **📺 Watch Trailers** - Dynamic trailer section powered by TMDB API
 - **🎫 Smart Booking** - Intuitive seat selection with real-time availability
@@ -26,6 +27,7 @@ Live Link: QuickShow[https://quickshow-sigma.vercel.app/]
 - **📱 Responsive Design** - Perfect experience on any device
 
 ### 👨‍💼 **For Administrators**
+
 - **📊 Analytics Dashboard** - Real-time booking statistics and revenue tracking
 - **🎬 Show Management** - Add new shows with automatic TMDB data integration
 - **👥 User Management** - View and manage user bookings
@@ -34,6 +36,7 @@ Live Link: QuickShow[https://quickshow-sigma.vercel.app/]
 ## 🛠️ Technology Stack
 
 ### **Frontend**
+
 ```
 React 19          → Modern UI framework
 Tailwind CSS      → Utility-first styling
@@ -46,6 +49,7 @@ React Hot Toast   → Elegant notifications
 ```
 
 ### **Backend**
+
 ```
 Node.js           → JavaScript runtime
 Express.js        → Web application framework
@@ -59,6 +63,7 @@ TMDB API          → Movie data and images
 ```
 
 ### **Services & APIs**
+
 ```
 TMDB API          → Movie data, trailers, cast information
 Stripe            → Payment processing and webhooks
@@ -72,30 +77,35 @@ Vercel            → Deployment and hosting
 ## 🎨 How I Built It
 
 ### **1. Frontend Architecture**
+
 - **Component-Based Design**: Modular React components for reusability
 - **Context API**: Global state management for user data and app state
 - **Custom Hooks**: Reusable logic for API calls and data fetching
 - **Responsive Design**: Mobile-first approach with Tailwind CSS
 
 ### **2. Backend Architecture**
+
 - **RESTful API**: Clean API design with proper HTTP methods
 - **MVC Pattern**: Organized controllers, models, and routes
 - **Middleware**: Authentication, CORS, and error handling
 - **Database Design**: Optimized schemas for movies, shows, bookings, and users
 
 ### **3. Payment Integration**
+
 - **Stripe Checkout**: Secure payment processing
 - **Webhook Handling**: Real-time payment status updates
 - **Auto-Sync**: Fallback payment verification system
 - **Error Handling**: Comprehensive error management
 
 ### **4. Email System**
+
 - **Automated Confirmations**: Beautiful HTML email templates
 - **Background Processing**: Inngest for reliable email delivery
 - **Retry Logic**: Ensures emails are delivered successfully
 - **Professional Design**: Branded email templates with booking details
 
 ### **5. Movie Data Integration**
+
 - **TMDB API**: Real-time movie data, images, and trailers
 - **Dynamic Content**: Auto-updating movie information
 - **Fallback System**: Graceful handling of API failures
@@ -104,40 +114,47 @@ Vercel            → Deployment and hosting
 ## 🚀 Getting Started
 
 ### **Quick Setup**
+
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/Reallyishan009/QuickShow.git
    cd QuickShow
    ```
 
 2. **Install dependencies**
+
    ```bash
    # Frontend
    cd client && npm install
-   
-   # Backend  
+
+   # Backend
    cd ../server && npm install
    ```
 
 3. **Configure environment variables**
+
    - Copy `.env.example` files in both client and server directories
    - Fill in your API keys and configuration
 
 4. **Start the application**
+
    ```bash
    # Backend (Terminal 1)
    cd server && npm run server
-   
+
    # Frontend (Terminal 2)
    cd client && npm run dev
    ```
 
 ### **Environment Variables**
+
 Check `.env.example` files in both `client/` and `server/` directories for required configuration.
 
 ## 🎯 Core Functionality
 
 ### **User Journey**
+
 1. **Discover** → Browse movies and watch trailers
 2. **Select** → Choose movie, date, and time
 3. **Book** → Select seats (up to 5 per booking)
@@ -146,6 +163,7 @@ Check `.env.example` files in both `client/` and `server/` directories for requi
 6. **Enjoy** → Show up and enjoy the movie!
 
 ### **Admin Workflow**
+
 1. **Add Movies** → Use TMDB ID to add new shows
 2. **Monitor** → Track bookings and revenue
 3. **Manage** → View and manage all user bookings
@@ -179,6 +197,7 @@ Check `.env.example` files in both `client/` and `server/` directories for requi
 ## 🚀 Deployment
 
 This app is ready for deployment on:
+
 - **Frontend**: Vercel, Netlify, or any static hosting
 - **Backend**: Vercel, Railway, Heroku, or any Node.js hosting
 - **Database**: MongoDB Atlas or any MongoDB hosting
@@ -195,4 +214,4 @@ This project is open source and available under the [MIT License](LICENSE).
 
 **🎬 Built with passion for cinema and modern web technologies**
 
-*QuickShow - Where every movie night begins* ✨
+_QuickShow - Where every movie night begins_ ✨

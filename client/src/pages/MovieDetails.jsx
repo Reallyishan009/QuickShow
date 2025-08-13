@@ -87,6 +87,16 @@ const MovieDetails = () => {
         </div>
       </div>
 
+      {/* Trailer Player Section - positioned just above "Your Favourite Cast" */}
+      <div className='mt-12'>
+        <TrailerPlayer 
+          movieId={show.movie._id}
+          movieTitle={show.movie.title}
+          onClose={() => setShowTrailer(false)}
+          isVisible={showTrailer}
+        />
+      </div>
+
       <p className='text-lg font-medium mt-20'>Your Favorite Cast</p>
       <div className='overflow-x-auto no-scrollbar mt-8 pb-4'>
         <div className='flex items-center gap-4 w-max px-4'>
@@ -100,16 +110,6 @@ const MovieDetails = () => {
       </div>
 
       <DateSelect dateTime={show.dateTime} id={id}/>
-
-      {/* Trailer Player Section - positioned after DateSelect and before "You May Also Like" */}
-      <div className='mt-12'>
-        <TrailerPlayer 
-          movieId={show.movie._id}
-          movieTitle={show.movie.title}
-          onClose={() => setShowTrailer(false)}
-          isVisible={showTrailer}
-        />
-      </div>
 
       <p className='text-lg font-medium mt-20 mb-8'>You May Also Like</p>
       <div className='flex flex-wrap max-sm:justify-center gap-8'>
