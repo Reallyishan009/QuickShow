@@ -216,6 +216,61 @@ const sendNewShowNotifications = inngest.createFunction(
     }
 )
 
+// Inngest Function to auto-sync payment status every 30 seconds
+const autoSyncPaymentStatus = inngest.createFunction(
+    {id: "auto-sync-payment-status"},
+    { cron: "*/30 * * * * *" }, // Every 30 seconds
+    async ({ step }) => {
+        const stripe = (await import('stripe')).default;
+        const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY);
+
+        // Get unpaid bookings from last 24 hours
+        const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+        const unpaidBookings = await Booking.find({
+            isPaid: false,
+            createdAt: { $gte: oneDayAgo },
+            paymentLink: { $exists: true, $ne: "" }
+        });
+
+        let syncedCount = 0;
+
+        for (const booking of unpaidBookings) {
+            try {
+                // Extract session ID from payment link
+                const sessionId = booking.paymentLink.split('/').pop().split('?')[0];
+                
+                // Check session status with Stripe
+                const session = await stripeInstance.checkout.sessions.retrieve(sessionId);
+                
+                if (session.payment_status === 'paid') {
+                    // Update booking status
+                    await Booking.findByIdAndUpdate(booking._id, {
+                        isPaid: true,
+                        paymentLink: ""
+                    });
+
+                    // Send confirmation email
+                    await inngest.send({
+                        name: "app/show.booked",
+                        data: { bookingId: booking._id.toString() }
+                    });
+
+                    syncedCount++;
+                    console.log(`✅ Auto-synced payment for booking: ${booking._id}`);
+                }
+            } catch (error) {
+                console.error(`❌ Error syncing booking ${booking._id}:`, error.message);
+            }
+        }
+
+        return { 
+            message: `Auto-sync completed. Synced ${syncedCount} payments.`,
+            syncedCount,
+            totalChecked: unpaidBookings.length
+        };
+    }
+)
+
 
 export const functions = [
     syncUserCreation,
@@ -224,5 +279,6 @@ export const functions = [
     releaseSeatsAndDeleteBooking,
     sendBookingConfirmationEmail,
     sendShowReminders,
-    sendNewShowNotifications
+    sendNewShowNotifications,
+    autoSyncPaymentStatus
 ];

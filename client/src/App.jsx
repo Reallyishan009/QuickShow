@@ -8,6 +8,7 @@ import MyBookings from './pages/MyBookings.jsx'
 import Favorite from './pages/Favorite.jsx'
 import Releases from './pages/Releases.jsx'
 import Theaters from './pages/Theaters.jsx'
+import Debug from './pages/Debug.jsx'
 import { Toaster } from 'react-hot-toast'
 import Footer from './components/Footer.jsx'
 import Layout from './pages/admin/Layout.jsx'
@@ -41,6 +42,7 @@ const App = () => {
         <Route path='/releases' element={<Releases/>} />
         <Route path='/theaters' element={<Theaters/>} />
         <Route path='/favorite' element={<Favorite/>} />
+        <Route path='/debug' element={<Debug/>} />
         <Route path='/admin/*' element={user ? <Layout/> : (
           <div className='min-h-screen flex justify-center items-center'>
             <SignIn afterSignInUrl={'/admin'} />
