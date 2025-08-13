@@ -57,7 +57,7 @@ const MovieSections = () => {
 
             <div className='flex items-center justify-between mt-4 pb-3'>
                 <button 
-                    onClick={() => { navigate(`/movies/${movie.id}`); scrollTo(0, 0) }} 
+                    onClick={() => { navigate(`/tmdb-movie/${movie.id}`); scrollTo(0, 0) }} 
                     className='px-4 py-2 text-xs bg-primary hover:bg-primary-dull transition rounded-full font-medium cursor-pointer'
                 >
                     View Details

@@ -101,14 +101,12 @@ const Releases = () => {
                         <span className='text-gray-500 text-sm'>({movie.vote_count} votes)</span>
                     </div>
                     
-                    {!isUpcoming && (
-                        <button 
-                            onClick={() => navigate(`/movies/${movie.id}`)}
-                            className='px-4 py-2 bg-primary hover:bg-primary-dull text-white text-sm rounded-lg transition-colors'
-                        >
-                            Book Now
-                        </button>
-                    )}
+                    <button 
+                        onClick={() => navigate(`/tmdb-movie/${movie.id}`)}
+                        className='px-4 py-2 bg-primary hover:bg-primary-dull text-white text-sm rounded-lg transition-colors'
+                    >
+                        {isUpcoming ? 'View Details' : 'View Details'}
+                    </button>
                 </div>
             </div>
         </div>
