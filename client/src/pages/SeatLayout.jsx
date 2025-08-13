@@ -166,6 +166,7 @@ const SeatLayout = () => {
          
       </div>
     </div>
+    </div>
   ) : (
     <Loading />
   )
