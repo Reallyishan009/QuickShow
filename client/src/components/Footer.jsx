@@ -8,8 +8,8 @@ const Footer = () => {
                 <div className="md:max-w-96">
                     <img className="w-36 h-auto" src={assets.logo} alt="logo" />
                     <p className="mt-6 text-sm">
-                        Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.
-                    </p>
+                        Project made by Ishan Tripathi. I am a full-Stack-developer, connect with me on GitHub(@Reallyishan009).
+                     </p>
                     <div className="flex items-center gap-2 mt-4">
                         <img src={assets.googlePlay} alt="google play" className="h-9 w-auto" />
                         <img src={assets.appStore} alt="app store" className="h-9 w-auto" />
@@ -35,7 +35,7 @@ const Footer = () => {
                 </div>
             </div>
             <p className="pt-4 text-center text-sm pb-5">
-                Copyright {new Date().getFullYear()} © GreatStack. All Right Reserved.
+                Copyright {new Date().getFullYear()} © Ishan Tripathi. All Right Reserved.
             </p>
         </footer>
   )
