@@ -47,6 +47,7 @@ const App = () => {
         <Route path='/favorite' element={<Favorite/>} />
         <Route path='/debug' element={<Debug/>} />
         <Route path='/payment-success' element={<PaymentSuccess/>} />
+        <Route path='/payment-success/' element={<PaymentSuccess/>} />
         <Route path='/admin/*' element={user ? <Layout/> : (
           <div className='min-h-screen flex justify-center items-center'>
             <SignIn afterSignInUrl={'/admin'} />
